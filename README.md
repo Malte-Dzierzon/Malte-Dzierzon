@@ -101,6 +101,7 @@
 [![Steam](steam.png)](https://steamcommunity.com/id/xealom/)
 [![YouTube](youtube.png)](https://www.youtube.com/@Xealom)
 [![TikTok](tiktok.png)](https://www.tiktok.com/@maltedz?is_from_webapp=1&sender_device=pc)
+[![Instagram](instagram.png)](https://www.tiktok.com/@maltedz?is_from_webapp=1&sender_device=pc)
 
 
 </div>
