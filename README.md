@@ -27,9 +27,9 @@
 ## Connect with me
 
 [![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/user/1029271091899809852)
-[![Steam](https://img.shields.io/badge/Steam-%23000000.svg?style=for-the-badge&logo=steam&logoColor=white)]([YOUR_STEAM_URL](https://steamcommunity.com/id/xealom/))
-[![YouTube](https://img.shields.io/badge/YouTube-%23FF0000.svg?style=for-the-badge&logo=youtube&logoColor=white)]([YOUR_YOUTUBE_URL](https://www.youtube.com/@Xealom))
-[![TikTok](https://img.shields.io/badge/TikTok-%23010101.svg?style=for-the-badge&logo=tiktok&logoColor=white)]([YOUR_TIKTOK_URL](https://www.tiktok.com/@maltedz?is_from_webapp=1&sender_device=pc))
+[![Steam](https://img.shields.io/badge/Steam-%23000000.svg?style=for-the-badge&logo=steam&logoColor=white)](https://steamcommunity.com/id/xealom/)
+[![YouTube](https://img.shields.io/badge/YouTube-%23FF0000.svg?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/@Xealom)
+[![TikTok](https://img.shields.io/badge/TikTok-%23010101.svg?style=for-the-badge&logo=tiktok&logoColor=white)](https://www.tiktok.com/@maltedz?is_from_webapp=1&sender_device=pc)
 
 ---
 
