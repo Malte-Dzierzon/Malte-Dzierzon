@@ -5,7 +5,16 @@
 
 <div align="center">
 
-# Malte Dzierzon
+  <table>
+  <tr>
+    <td>
+      <b>⊱──────────────  Malte Dzierzon ──────────────⊰ </b>           
+    </td>
+  </tr>
+</table>
+
+<br>
+<br>
 
 *Learning by doing. I design and build cozy projects through trial, error, and intuition – no manuals needed.*
 
@@ -15,9 +24,28 @@
 
 </div>
 
-[![My Skills](https://skillicons.dev/icons?i=linux,python,js,pytorch,unreal&theme=dark)](https://skillicons.dev)
- 
-[![My Skills](https://skillicons.dev/icons?i=vue,astro,react,css,obsidian&theme=dark)](https://skillicons.dev)
+<div align="center">
+  <table>
+    <tr>
+      <td align="right" width="150px"><b>Daily:</b></td>
+      <td>
+        <a href="https://skillicons.dev"><img src="https://skillicons.dev/icons?i=arch,python,windows,obsidian,discord,vscode,instagram&theme=dark" /></a>
+      </td>
+    </tr>
+    <tr>
+      <td align="right"><b>Proficient:</b></td>
+      <td>
+        <a href="https://skillicons.dev"><img src="https://skillicons.dev/icons?i=js,react,unreal,blender,figma,css&theme=dark" /></a>
+      </td>
+    </tr>
+    <tr>
+      <td align="right"><b>Familiar:</b></td>
+      <td>
+        <a href="https://skillicons.dev"><img src="https://skillicons.dev/icons?i=vue,astro,pytorch,godot&theme=dark" /></a>
+      </td>
+    </tr>
+  </table>
+</div>
 
 <br>
 <details>
