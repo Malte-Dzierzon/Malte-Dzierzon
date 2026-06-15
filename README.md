@@ -54,7 +54,7 @@
 
 <table width="80%">
   <tr>
-    <td width="25%" valign="center"><b>Arch Linux Setup (Phinox)</b></td>
+    <td width="25%" valign="center"><b>Arch Linux Rice</b></td>
     <td width="50%" valign="top">A fully customized and optimized Linux rice based on Arch Linux, featuring a personalized desktop environment and tailored development workflows.</td>
     <td width="25%" align="center" valign="center">████░░░░░░░░ 40%</td>
   </tr>
@@ -70,7 +70,7 @@
 
 <table width="80%">
   <tr>
-    <td width="25%" valign="center"><b>Custom Neural Network AI</b></td>
+    <td width="25%" valign="center"><b> Neural Network in Python</b></td>
     <td width="50%" valign="top">A collaborative computer science project focused on neural networks, resulting in the development of a functional, lightweight AI agent built from scratch.</td>
     <td width="25%" align="center" valign="center">████████████ 100%</td>
   </tr>
@@ -86,7 +86,7 @@
 
 <table width="80%">
   <tr>
-    <td width="25%" valign="center"><b>Custom Minecraft Modpack</b></td>
+    <td width="25%" valign="center"><b>Minecraft Modpack Fabric 1.21.11</b></td>
     <td width="50%" valign="top">A fully curated and publicly released modification package for Minecraft, complete with a dedicated landing page and official website deployment.</td>
     <td width="25%" align="center" valign="center">████████████ 100%</td>
   </tr>
