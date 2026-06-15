@@ -9,9 +9,9 @@
 
 *Learning by doing. I design and build cozy projects through trial, error, and intuition – no manuals needed.*
 
----
 <div align="center">
-
+<br>
+<br>
 
 </div>
 
@@ -19,28 +19,27 @@
  
 [![My Skills](https://skillicons.dev/icons?i=vue,astro,react,css,obsidian&theme=dark)](https://skillicons.dev)
 
----
+<br>
+<details>
+<summary>Projects</summary>
 
-## Projects
+| Projekt | Fortschritt |
+|---|---|
+| Portfolio | `██████░░░░` 60% |
+| AI Agent | `██████████` 100% |
+| Linux RICE | `████░░░░░░` 40% |
 
-| Project | Progress |
-|---------|----------|
-| Portfolio Website | `██░░░░░░░░` 20%  |
-| Neural Network | `██████████` 100% |
-| Custom Linux RISE | `█░░░░░░░░░` 10%  |
-| Minecraft Modpack | `██████████` 100% |
+</details>
 
----
+<br>
+<br>
 
 ## Connect with me
 
-[![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/user/1029271091899809852)
-[![Steam](https://img.shields.io/badge/Steam-%23000000.svg?style=for-the-badge&logo=steam&logoColor=white)](https://steamcommunity.com/id/xealom/)
-[![YouTube](https://img.shields.io/badge/YouTube-%23FF0000.svg?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/@Xealom)
-[![TikTok](https://img.shields.io/badge/TikTok-%23010101.svg?style=for-the-badge&logo=tiktok&logoColor=white)](https://www.tiktok.com/@maltedz?is_from_webapp=1&sender_device=pc)
+[![Discord](discord.png)](https://discord.com/user/1029271091899809852)
+[![Steam](steam.png)](https://steamcommunity.com/id/xealom/)
+[![YouTube](youtube.png)](https://www.youtube.com/@Xealom)
+[![TikTok](tiktok.png)](https://www.tiktok.com/@maltedz?is_from_webapp=1&sender_device=pc)
 
----
-
-*Thanks for stopping by · stay cozy* 
 
 </div>
