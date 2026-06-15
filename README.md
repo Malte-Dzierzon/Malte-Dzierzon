@@ -8,7 +8,7 @@
   <table>
   <tr>
     <td>
-      <b>⊱──────────────  Malte Dzierzon ──────────────⊰ </b>           
+      <b>⊱───  Malte Dzierzon ───⊰ </b>           
     </td>
   </tr>
 </table>
