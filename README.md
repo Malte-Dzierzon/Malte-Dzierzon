@@ -10,8 +10,8 @@
 *Learning by doing. I design and build cozy projects through trial, error, and intuition – no manuals needed.*
 
 ---
+<div align="center">
 
-Design | Prototyping | Experiments
 
 </div>
 
