@@ -16,7 +16,7 @@
 <br>
 <br>
 
-*Learning by doing. I design and build cozy projects through trial, error, and intuition – no manuals needed.*
+*"Learning by doing. I design and build cozy projects through trial, error, and intuition – no manuals needed."*
 
 <div align="center">
 <br>
@@ -48,16 +48,49 @@
 </div>
 
 <br>
-<details>
-<summary>Projects</summary>
+<br>
+<br>
+<br>
 
-| Projekt | Fortschritt |
-|---|---|
-| Portfolio | `██████░░░░` 60% |
-| AI Agent | `██████████` 100% |
-| Linux RICE | `████░░░░░░` 40% |
+<table width="80%">
+  <tr>
+    <td width="25%" valign="center"><b>Arch Linux Setup (Phinox)</b></td>
+    <td width="50%" valign="top">A fully customized and optimized Linux rice based on Arch Linux, featuring a personalized desktop environment and tailored development workflows.</td>
+    <td width="25%" align="center" valign="center">████░░░░░░░░ 40%</td>
+  </tr>
+</table>
 
-</details>
+<table width="80%">
+  <tr>
+    <td width="25%" valign="center"><b>Personal Dashboard Portfolio</b></td>
+    <td width="50%" valign="top">A comprehensive, custom-built portfolio website designed as an interactive personal dashboard to showcase live metrics and development work.</td>
+    <td width="25%" align="center" valign="center">██████░░░░░░ 60%</td>
+  </tr>
+</table>
+
+<table width="80%">
+  <tr>
+    <td width="25%" valign="center"><b>Custom Neural Network AI</b></td>
+    <td width="50%" valign="top">A collaborative computer science project focused on neural networks, resulting in the development of a functional, lightweight AI agent built from scratch.</td>
+    <td width="25%" align="center" valign="center">████████████ 100%</td>
+  </tr>
+</table>
+
+<table width="80%">
+  <tr>
+    <td width="25%" valign="center"><b>2.5D Soulslike Game Demo</b></td>
+    <td width="50%" valign="top">Developed as an advanced hobby project and part of my junior university studies. A completed 2.5D Soulslike action game built in Unreal Engine 5 with a playable demo.</td>
+    <td width="25%" align="center" valign="center">████████████ 100%</td>
+  </tr>
+</table>
+
+<table width="80%">
+  <tr>
+    <td width="25%" valign="center"><b>Custom Minecraft Modpack</b></td>
+    <td width="50%" valign="top">A fully curated and publicly released modification package for Minecraft, complete with a dedicated landing page and official website deployment.</td>
+    <td width="25%" align="center" valign="center">████████████ 100%</td>
+  </tr>
+</table>
 
 <br>
 <br>
