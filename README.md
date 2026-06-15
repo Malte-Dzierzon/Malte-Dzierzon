@@ -1,11 +1,19 @@
 <div align="center">
+  <img src="https://i.pinimg.com/originals/c2/2c/c8/c22cc88b41ec15f991044bf25cf8007c.gif" alt="Descriptive Text for the GIF" width="100%" />
+  <hr style="width: 100%; border: 1px solid #30363d; margin-top: 10px;" />
+</div>
+
+<div align="center">
 
 # Malte Dzierzon
 
-
-*I build things that feel just right, one cozy project at a time.*
+*Learning by doing. I design and build cozy projects through trial, error, and intuition – no manuals needed.*
 
 ---
+
+Design | Prototyping | Experiments
+
+</div>
 
 [![My Skills](https://skillicons.dev/icons?i=linux,python,js,pytorch,unreal&theme=dark)](https://skillicons.dev)
  
