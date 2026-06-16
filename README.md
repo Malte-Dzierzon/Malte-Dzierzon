@@ -65,7 +65,7 @@
 <table width="80%">
   <tr>
     <td width="25%" valign="center"><b>Personal Dashboard Portfolio</b></td>
-    [span_0](start_span)[span_1](start_span)<td width="50%" valign="top">A cozy, desktop-first personal website[span_0](end_span)[span_1](end_span) [span_2](start_span)[span_3](start_span)designed as an interactive pixel-art dashboard[span_2](end_span)[span_3](end_span). [span_4](start_span)Features custom animations like a sleeping cat[span_4](end_span) [span_5](start_span)and integrated live-status widgets for Discord and Steam[span_5](end_span).</td>
+    <td width="50%" valign="top">A component-driven personal portfolio website designed as an interactive dashboard, featuring a dynamic tech-stack overview and integrated live-activity widgets.</td>
     <td width="25%" align="center" valign="center">███░░░░░░░░░ 30%</td>
   </tr>
 </table>
