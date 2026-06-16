@@ -96,8 +96,8 @@
 [![Discord](discord.png)](https://discord.com/user/1029271091899809852)
 [![Steam](steam.png)](https://steamcommunity.com/id/xealom/)
 [![YouTube](youtube.png)](https://www.youtube.com/@Xealom)
-[![TikTok](tiktok.png)](https://www.tiktok.com/@maltedz?is_from_webapp=1&sender_device=pc)
-[![Instagram](instagram.png)](https://www.tiktok.com/@maltedz?is_from_webapp=1&sender_device=pc)
+[![TikTok](tiktok.png)](https://www.tiktok.com/@maltedz)
+[![Instagram](instagram.png)](https://www.instagram.com/malte.dzierzon)
 
 
 </div>
