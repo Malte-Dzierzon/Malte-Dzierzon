@@ -56,46 +56,51 @@
 <table width="80%">
   <tr>
     <td width="25%" valign="center"><b>Arch Linux Rice</b></td>
-    <td width="50%" valign="top">A fully customized and optimized Linux rice based on Arch Linux, featuring a personalized desktop environment and tailored development workflows.</td>
+    <td width="50%" valign="top">A fully customized and optimized Linux environment built on Arch Linux, featuring custom configurations, a personalized desktop layout, and tailored terminal workflows.</td>
     <td width="25%" align="center" valign="center">█░░░░░░░░░░░ 10%</td>
   </tr>
 </table>
+</div>
 
 <div align="center">
 <table width="80%">
   <tr>
     <td width="25%" valign="center"><b>Personal Dashboard Portfolio</b></td>
-    <td width="50%" valign="top">A comprehensive, custom-built portfolio website designed as an interactive personal dashboard to showcase live metrics and development work.</td>
+    [span_0](start_span)[span_1](start_span)<td width="50%" valign="top">A cozy, desktop-optimized portfolio website designed as an interactive pixel-art dashboard[span_0](end_span)[span_1](end_span). [span_2](start_span)Integrates custom graphic assets[span_2](end_span)[span_3](start_span), a dedicated animation system[span_3](end_span)[span_4](start_span)[span_5](start_span), and live API widgets for Discord and Steam activity[span_4](end_span)[span_5](end_span).</td>
     <td width="25%" align="center" valign="center">███░░░░░░░░░ 30%</td>
   </tr>
 </table>
+</div>
 
 <div align="center">
 <table width="80%">
   <tr>
-    <td width="25%" valign="center"><b> Neural Network in Python</b></td>
-    <td width="50%" valign="top">A collaborative computer science project focused on neural networks, resulting in the development of a functional, lightweight AI agent built from scratch.</td>
+    <td width="25%" valign="center"><b>Neural Network in Python</b></td>
+    <td width="50%" valign="top">A collaborative computer science project focused on machine learning, resulting in a lightweight, functional neural network built completely from scratch using Python and PyTorch.</td>
     <td width="25%" align="center" valign="center">██████████░░ 80%</td>
   </tr>
 </table>
+</div>
 
 <div align="center">
 <table width="80%">
   <tr>
     <td width="25%" valign="center"><b>2.5D Soulslike Game Demo</b></td>
-    <td width="50%" valign="top">Developed as an advanced hobby project and part of my junior university studies. A completed 2.5D Soulslike action game built in Unreal Engine 5 with a playable demo.</td>
+    <td width="50%" valign="top">Developed as an advanced hobby project and part of junior university studies. A fully completed 2.5D action-RPG demo engineered within Unreal Engine 5, featuring tight combat mechanics and atmosphere.</td>
     <td width="25%" align="center" valign="center">████████████ 100%</td>
   </tr>
 </table>
+</div>
 
 <div align="center">
 <table width="80%">
   <tr>
-    <td width="25%" valign="center"><b>Minecraft Modpack Fabric 1.21.11</b></td>
-    <td width="50%" valign="top">A fully curated and publicly released modification package for Minecraft, complete with a dedicated landing page and official website deployment.</td>
+    <td width="25%" valign="center"><b>Paleon - Vanilla+ Modpack</b></td>
+    <td width="50%" valign="top">A performance-optimized Vanilla+ modpack for Minecraft 1.21.11 on Fabric, built with custom shader integration, enhanced world generation (Geophilic, Incendium), and a dedicated web landing page.</td>
     <td width="25%" align="center" valign="center">████████████ 100%</td>
   </tr>
 </table>
+</div>
 
 <br>
 <br>
