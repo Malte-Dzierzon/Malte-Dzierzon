@@ -8,7 +8,7 @@
   <table>
   <tr>
     <td>
-      <b> <h3>Malte Dzierzon</h3> </b>           
+      <b> Malte Dzierzon </b>           
     </td>
   </tr>
 </table>
