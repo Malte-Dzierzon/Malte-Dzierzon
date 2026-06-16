@@ -4,16 +4,6 @@
 </div>
 
 <div align="center">
-
-  <table>
-  <tr>
-    <td>
-      <b> Malte Dzierzon </b>           
-    </td>
-  </tr>
-</table>
-
-<br>
 <br>
 
 *"Learning by doing. I design and build cozy projects through trial, error, and intuition – no manuals needed."*
