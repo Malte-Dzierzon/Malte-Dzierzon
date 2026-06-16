@@ -52,6 +52,7 @@
 <br>
 <br>
 
+<div align="center">
 <table width="80%">
   <tr>
     <td width="25%" valign="center"><b>Arch Linux Rice</b></td>
@@ -60,6 +61,7 @@
   </tr>
 </table>
 
+<div align="center">
 <table width="80%">
   <tr>
     <td width="25%" valign="center"><b>Personal Dashboard Portfolio</b></td>
@@ -68,6 +70,7 @@
   </tr>
 </table>
 
+<div align="center">
 <table width="80%">
   <tr>
     <td width="25%" valign="center"><b> Neural Network in Python</b></td>
@@ -76,6 +79,7 @@
   </tr>
 </table>
 
+<div align="center">
 <table width="80%">
   <tr>
     <td width="25%" valign="center"><b>2.5D Soulslike Game Demo</b></td>
@@ -84,6 +88,7 @@
   </tr>
 </table>
 
+<div align="center">
 <table width="80%">
   <tr>
     <td width="25%" valign="center"><b>Minecraft Modpack Fabric 1.21.11</b></td>
@@ -94,6 +99,7 @@
 
 <br>
 <br>
+
 
 ## Connect with me
 
