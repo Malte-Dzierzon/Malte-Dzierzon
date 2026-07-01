@@ -65,7 +65,7 @@
   <tr>
     <td width="25%" valign="center"><b> Neural Network in Python</b></td>
     <td width="50%" valign="top">A collaborative computer science project on 3D object classification, building a lightweight neural network that identifies pyramids vs. noise from vertex data using Python and NumPy.</td>
-    <td width="25%" align="center" valign="center">██████████░░ 80%</td>
+    <td width="25%" align="center" valign="center">████████████ 80%</td>
   </tr>
 </table>
 
