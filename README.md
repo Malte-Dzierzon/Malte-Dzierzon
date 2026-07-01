@@ -45,9 +45,9 @@
 <div align="center">
 <table width="80%">
   <tr>
-    <td width="25%" valign="center"><b>Arch Linux Rice</b></td>
-    <td width="50%" valign="top">A fully customized and optimized Linux environment built on Arch Linux, featuring personalized desktop configurations and tailored terminal workflows.</td>
-    <td width="25%" align="center" valign="center">█░░░░░░░░░░░ 10%</td>
+    <td width="25%" valign="center"><b>MTG Multiverse Studio</b></td>
+    <td width="50%" valign="top">A local-first Magic: The Gathering desktop app — collection manager, deck builder, Artbook & lore-narrative. No cloud, no tracking.</td>
+    <td width="25%" align="center" valign="center">██░░░░░░░░░░ 20%</td>
   </tr>
 </table>
 
