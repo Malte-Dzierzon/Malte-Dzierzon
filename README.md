@@ -17,23 +17,53 @@
 <div align="center">
   <table>
     <tr>
-      <td align="right" width="150px"><b>Daily:</b></td>
+      <td align="right" width="150px"><b>Core:</b></td>
       <td>
-        <a href="https://skillicons.dev"><img src="https://skillicons.dev/icons?i=arch,python,windows,obsidian,discord,vscode,instagram&theme=dark" /></a>
+        <a href="https://skillicons.dev">
+          <img src="https://skillicons.dev/icons?i=arch,git,github,typescript,rust,python&theme=dark" />
+        </a>
       </td>
     </tr>
-    <tr>
-      <td align="right"><b>Proficient:</b></td>
-      <td>
-        <a href="https://skillicons.dev"><img src="https://skillicons.dev/icons?i=js,react,unreal,blender,figma,css&theme=dark" /></a>
-      </td>
-    </tr>
-    <tr>
-      <td align="right"><b>Familiar:</b></td>
-      <td>
-        <a href="https://skillicons.dev"><img src="https://skillicons.dev/icons?i=vue,astro,pytorch,godot&theme=dark" /></a>
-      </td>
-    </tr>
+
+
+<tr>
+  <td align="right"><b>Building:</b></td>
+  <td>
+    <a href="https://skillicons.dev">
+      <img src="https://skillicons.dev/icons?i=react,tailwind,vite,tauri,python&theme=dark" />
+    </a>
+  </td>
+</tr>
+
+<tr>
+  <td align="right"><b>Local AI:</b></td>
+  <td>
+    <a href="https://skillicons.dev">
+      <img src="https://skillicons.dev/icons?i=python,pytorch&theme=dark" />
+    </a>
+    <br>
+    <sub>LM Studio · llama.cpp · Qwen </sub>
+  </td>
+</tr>
+
+<tr>
+  <td align="right"><b>Tools:</b></td>
+  <td>
+    <a href="https://skillicons.dev">
+      <img src="https://skillicons.dev/icons?i=zed,blender,figma&theme=dark" />
+    </a>
+  </td>
+</tr>
+
+<tr>
+  <td align="right"><b>Familiar:</b></td>
+  <td>
+    <a href="https://skillicons.dev">
+      <img src="https://skillicons.dev/icons?i=godot,unreal,vue,astro&theme=dark" />
+    </a>
+  </td>
+</tr>
+
   </table>
 </div>
 
@@ -45,17 +75,8 @@
 <div align="center">
 <table width="80%">
   <tr>
-    <td width="25%" valign="center"><b>MTG Multiverse Studio</b></td>
-    <td width="50%" valign="top">A local-first Magic: The Gathering desktop app — collection manager, deck builder, Artbook & lore-narrative. No cloud, no tracking.</td>
-    <td width="25%" align="center" valign="center">██░░░░░░░░░░ 20%</td>
-  </tr>
-</table>
-
-<div align="center">
-<table width="80%">
-  <tr>
-    <td width="25%" valign="center"><b>Personal Dashboard Portfolio</b></td>
-    <td width="50%" valign="top">A component-driven personal portfolio website designed as an interactive dashboard, featuring a dynamic tech-stack overview and integrated live-activity widgets.</td>
+    <td width="25%" valign="center"><b>MTG Deck Manager</b></td>
+    <td width="50%" valign="top">A minimal Linux TUI for organizing Magic: The Gathering decks with a lightweight LLM agent harness. Built around local-first workflows, terminal-based card browsing and Kitty image rendering.</td>
     <td width="25%" align="center" valign="center">███░░░░░░░░░ 30%</td>
   </tr>
 </table>
@@ -63,8 +84,44 @@
 <div align="center">
 <table width="80%">
   <tr>
-    <td width="25%" valign="center"><b> Neural Network in Python</b></td>
-    <td width="50%" valign="top">A collaborative computer science project on 3D object classification, building a lightweight neural network that identifies pyramids vs. noise from vertex data using Python and NumPy.</td>
+    <td width="25%" valign="center"><b>AgentWorkspace</b></td>
+    <td width="50%" valign="top">A local-first desktop workspace for AI-assisted development, built with Tauri, React and TypeScript. Focused on agent workflows, persistent local state and an extensible desktop UI.</td>
+    <td width="25%" align="center" valign="center">██░░░░░░░░░░ 20%</td>
+  </tr>
+</table>
+
+<div align="center">
+<table width="80%">
+  <tr>
+    <td width="25%" valign="center"><b>Dreamworlds</b></td>
+    <td width="50%" valign="top">A dark, dreamlike 3D platformer built in Godot, combining procedurally generated vertical worlds, biome-based exploration and action-focused combat inspired by Hollow Knight and Little Nightmares.</td>
+    <td width="25%" align="center" valign="center">█░░░░░░░░░░░ 5%</td>
+  </tr>
+</table>
+
+<div align="center">
+<table width="80%">
+  <tr>
+    <td width="25%" valign="center"><b>Minecraft Modpack Projects</b></td>
+    <td width="50%" valign="top">A collection of Minecraft modpack projects including Paleon and a NeoForge RPG pack, focused on performance, world generation, shaders, progression and custom mod configurations.</td>
+    <td width="25%" align="center" valign="center">███████░░░░░ 60%</td>
+  </tr>
+</table>
+
+<div align="center">
+<table width="80%">
+  <tr>
+    <td width="25%" valign="center"><b>Personal Dashboard Portfolio</b></td>
+    <td width="50%" valign="top">A component-driven personal portfolio designed as an interactive dashboard, combining a custom tech-stack overview with live activity, project information and dynamic widgets.</td>
+    <td width="25%" align="center" valign="center">███░░░░░░░░░ 30%</td>
+  </tr>
+</table>
+
+<div align="center">
+<table width="80%">
+  <tr>
+    <td width="25%" valign="center"><b>Neural Network in Python</b></td>
+    <td width="50%" valign="top">A lightweight neural network for 3D object classification, identifying pyramids and noise from vertex data using Python and NumPy.</td>
     <td width="25%" align="center" valign="center">████████████ 100%</td>
   </tr>
 </table>
@@ -73,16 +130,7 @@
 <table width="80%">
   <tr>
     <td width="25%" valign="center"><b>2.5D Soulslike Game Demo</b></td>
-    <td width="50%" valign="top">Developed as an advanced action-RPG hobby project and part of junior university studies. A completed 2.5D Soulslike game engineered in Unreal Engine 5 with a playable demo.</td>
-    <td width="25%" align="center" valign="center">████████████ 100%</td>
-  </tr>
-</table>
-
-<div align="center">
-<table width="80%">
-  <tr>
-    <td width="25%" valign="center"><b>Minecraft Modpack Fabric 1.21.11</b></td>
-    <td width="50%" valign="top">Paleon — a performance-optimized Vanilla+ modpack for Minecraft 1.21.11 on Fabric. Built with custom shaders, enhanced world generation (Geophilic, Incendium), and a dedicated landing page.</td>
+    <td width="50%" valign="top">A completed 2.5D action-RPG prototype developed in Unreal Engine 5, featuring Soulslike-inspired combat and a fully playable demo.</td>
     <td width="25%" align="center" valign="center">████████████ 100%</td>
   </tr>
 </table>
