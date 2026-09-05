@@ -6,7 +6,7 @@
 <div align="center">
 <br>
 
-*"Learning by doing. I design and build cozy projects through trial, error, and intuition – no manuals needed."*
+[https://drift.rip/Xealom](https://drift.rip/Xealom)  
 
 <div align="center">
 <br>
