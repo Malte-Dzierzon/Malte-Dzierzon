@@ -18,8 +18,8 @@ from typing import Any
 README_PATH = os.path.join(os.path.dirname(__file__), "..", "README.md")
 ACTIVITY_MARKER = "ACTIVITY"
 REPOSITORIES_MARKER = "REPOSITORIES"
-MAX_ACTIVITIES = 5
-MAX_REPOSITORIES = 3
+MAX_ACTIVITIES = 4
+MAX_REPOSITORIES = 4
 GITHUB_API = "https://api.github.com"
 USER = "Malte-Dzierzon"
 REPO = "Malte-Dzierzon"  # profile repo name, to exclude self-updates
@@ -85,7 +85,8 @@ def fetch_events(token: str | None) -> list[dict[str, Any]]:
 
 def fetch_repositories(token: str | None) -> list[dict[str, Any]]:
     """Fetch public repositories for the user from GitHub API."""
-    url = f"{GITHUB_API}/users/{USER}/repos?per_page=100&sort=pushed&direction=desc"
+    # Fetch all repos without relying on API sort; we'll sort explicitly
+    url = f"{GITHUB_API}/users/{USER}/repos?per_page=100"
     return fetch_json(url, token)
 
 
@@ -101,6 +102,17 @@ def fetch_commits(token: str | None) -> list[dict[str, Any]]:
     accept = "application/vnd.github.cloak-preview"
     data = fetch_json(url, token, accept=accept)
     return data.get("items", [])
+
+
+def parse_iso_timestamp(ts: str | None) -> datetime | None:
+    """Parse ISO 8601 timestamp to UTC datetime. Returns None on failure."""
+    if not ts:
+        return None
+    try:
+        # Handle Z suffix and optional timezone offset
+        return datetime.fromisoformat(ts.replace("Z", "+00:00")).astimezone(timezone.utc)
+    except Exception:
+        return None
 
 
 def is_meaningful_event(event: dict[str, Any]) -> bool:
@@ -125,42 +137,55 @@ def is_meaningful_event(event: dict[str, Any]) -> bool:
     )
 
 
-def format_event(event: dict[str, Any]) -> str | None:
-    """Format a single event as a markdown line."""
+def extract_commit_sha_from_event(event: dict[str, Any]) -> str | None:
+    """Extract the commit SHA from a PushEvent if available."""
+    if event.get("type") != "PushEvent":
+        return None
+    commits = event.get("payload", {}).get("commits", [])
+    if not commits:
+        return None
+    sha = commits[-1].get("sha", "")
+    return sha[:7] if sha else None
+
+
+def format_event(event: dict[str, Any]) -> tuple[str | None, datetime | None, str | None]:
+    """
+    Format a single event as a markdown line.
+    Returns (markdown_line, timestamp_utc, commit_sha_short_or_None).
+    """
     etype = event.get("type")
     repo = event.get("repo", {})
     repo_name = repo.get("name", "")
     repo_url = f"https://github.com/{repo_name}"
     created = event.get("created_at", "")
-    try:
-        dt = datetime.fromisoformat(created.replace("Z", "+00:00"))
-        date_str = dt.strftime("%Y-%m-%d")
-    except Exception:
-        date_str = created[:10] if created else "?"
+    ts = parse_iso_timestamp(created)
 
     payload = event.get("payload", {})
 
     if etype == "PushEvent":
         commits = payload.get("commits", [])
         if not commits:
-            return None
+            return None, ts, None
         msg = commits[-1].get("message", "").split("\n")[0].strip()
         msg = msg[:80]
         commit_sha = commits[-1].get("sha", "")[:7]
         commit_url = f"{repo_url}/commit/{commit_sha}"
-        return f"- [{repo_name}]({repo_url}) — {msg} ([{commit_sha}]({commit_url})) — {date_str}"
+        line = f"- [{repo_name}]({repo_url}) — {msg} ([{commit_sha}]({commit_url})) — {ts.strftime('%Y-%m-%d') if ts else '?'}"
+        return line, ts, commit_sha
 
     elif etype == "CreateEvent":
         ref_type = payload.get("ref_type")
         ref = payload.get("ref", "")
         if ref_type == "repository":
-            return f"- Created [{repo_name}]({repo_url}) — {date_str}"
+            line = f"- Created [{repo_name}]({repo_url}) — {ts.strftime('%Y-%m-%d') if ts else '?'}"
         elif ref_type == "branch":
-            return f"- Created branch `{ref}` in [{repo_name}]({repo_url}) — {date_str}"
+            line = f"- Created branch `{ref}` in [{repo_name}]({repo_url}) — {ts.strftime('%Y-%m-%d') if ts else '?'}"
         elif ref_type == "tag":
             tag_url = f"{repo_url}/releases/tag/{ref}"
-            return f"- Tagged [{ref}]({tag_url}) in [{repo_name}]({repo_url}) — {date_str}"
-        return None
+            line = f"- Tagged [{ref}]({tag_url}) in [{repo_name}]({repo_url}) — {ts.strftime('%Y-%m-%d') if ts else '?'}"
+        else:
+            return None, ts, None
+        return line, ts, None
 
     elif etype == "ReleaseEvent":
         action = payload.get("action", "published")
@@ -168,7 +193,8 @@ def format_event(event: dict[str, Any]) -> str | None:
         tag = release.get("tag_name", "")
         name = release.get("name", tag)
         url = release.get("html_url", repo_url)
-        return f"- {action.capitalize()} [{name}]({url}) in [{repo_name}]({repo_url}) — {date_str}"
+        line = f"- {action.capitalize()} [{name}]({url}) in [{repo_name}]({repo_url}) — {ts.strftime('%Y-%m-%d') if ts else '?'}"
+        return line, ts, None
 
     elif etype == "PullRequestEvent":
         action = payload.get("action", "")
@@ -179,8 +205,9 @@ def format_event(event: dict[str, Any]) -> str | None:
         if action in ("opened", "closed", "merged"):
             verb = "merged" if action == "closed" and pr.get("merged") else action
             title_part = f" [{title}]({url})" if title and url else f" #{number}"
-            return f"- PR{title_part} {verb} in [{repo_name}]({repo_url}) — {date_str}"
-        return None
+            line = f"- PR{title_part} {verb} in [{repo_name}]({repo_url}) — {ts.strftime('%Y-%m-%d') if ts else '?'}"
+            return line, ts, None
+        return None, ts, None
 
     elif etype == "IssuesEvent":
         action = payload.get("action", "")
@@ -189,20 +216,25 @@ def format_event(event: dict[str, Any]) -> str | None:
         number = issue.get("number", "")
         url = issue.get("html_url", "")
         if action in ("opened", "closed"):
-            return f"- Issue #{number} {action}: [{title}]({url}) in [{repo_name}]({repo_url}) — {date_str}"
-        return None
+            line = f"- Issue #{number} {action}: [{title}]({url}) in [{repo_name}]({repo_url}) — {ts.strftime('%Y-%m-%d') if ts else '?'}"
+            return line, ts, None
+        return None, ts, None
 
     elif etype == "ForkEvent":
         forkee = payload.get("forkee", {})
         fork_name = forkee.get("full_name", "")
         fork_url = forkee.get("html_url", "")
-        return f"- Forked [{fork_name}]({fork_url}) from [{repo_name}]({repo_url}) — {date_str}"
+        line = f"- Forked [{fork_name}]({fork_url}) from [{repo_name}]({repo_url}) — {ts.strftime('%Y-%m-%d') if ts else '?'}"
+        return line, ts, None
 
-    return None
+    return None, ts, None
 
 
-def format_commit(commit: dict[str, Any]) -> str | None:
-    """Format a commit from search API as a markdown line."""
+def format_commit(commit: dict[str, Any]) -> tuple[str | None, datetime | None, str | None]:
+    """
+    Format a commit from search API as a markdown line.
+    Returns (markdown_line, timestamp_utc, commit_sha_short).
+    """
     sha = commit.get("sha", "")
     commit_url = commit.get("html_url", "")
     repo = commit.get("repository", {})
@@ -211,79 +243,61 @@ def format_commit(commit: dict[str, Any]) -> str | None:
     message = commit.get("commit", {}).get("message", "").split("\n")[0].strip()
     message = message[:80]
     date_str = commit.get("commit", {}).get("committer", {}).get("date", "")
-    try:
-        dt = datetime.fromisoformat(date_str.replace("Z", "+00:00"))
-        date_str = dt.strftime("%Y-%m-%d")
-    except Exception:
-        date_str = date_str[:10] if date_str else "?"
+    ts = parse_iso_timestamp(date_str)
 
     # Exclude profile repo
     if repo_name == f"{USER}/{REPO}":
-        return None
+        return None, ts, None
 
     short_sha = sha[:7]
-    return f"- [{repo_name}]({repo_url}) — {message} ([{short_sha}]({commit_url})) — {date_str}"
-
-
-def deduplicate_events(formatted: list[str]) -> list[str]:
-    """Remove duplicate or near-duplicate event lines."""
-    seen = set()
-    result = []
-    for line in formatted:
-        # Normalize for comparison: strip date, commit sha
-        normalized = re.sub(r"\([^)]+\) — \d{4}-\d{2}-\d{2}$", "", line)
-        normalized = re.sub(r"— \d{4}-\d{2}-\d{2}$", "", normalized)
-        normalized = normalized.strip()
-        if normalized not in seen:
-            seen.add(normalized)
-            result.append(line)
-    return result
-
-
-def sort_by_date_desc(lines: list[str]) -> list[str]:
-    """Sort markdown lines by date (YYYY-MM-DD at end) descending."""
-    def extract_date(line: str) -> str:
-        match = re.search(r"(\d{4}-\d{2}-\d{2})$", line)
-        return match.group(1) if match else "0000-00-00"
-
-    return sorted(lines, key=extract_date, reverse=True)
+    line = f"- [{repo_name}]({repo_url}) — {message} ([{short_sha}]({commit_url})) — {ts.strftime('%Y-%m-%d') if ts else '?'}"
+    return line, ts, short_sha
 
 
 def build_activity_section(events: list[dict[str, Any]], commits: list[dict[str, Any]]) -> str:
     """Build the activity markdown section from events and commits."""
     meaningful = [e for e in events if is_meaningful_event(e)]
-    formatted = []
+
+    # Collect all items with their timestamps and SHAs for proper sorting and dedup
+    items: list[tuple[str, datetime, str | None]] = []
 
     # Format events
     for e in meaningful:
-        line = format_event(e)
-        if line:
-            formatted.append(line)
+        line, ts, sha = format_event(e)
+        if line and ts:
+            items.append((line, ts, sha))
 
     # Format commits
     for c in commits:
-        line = format_commit(c)
-        if line:
-            formatted.append(line)
+        line, ts, sha = format_commit(c)
+        if line and ts:
+            items.append((line, ts, sha))
 
-    # Deduplicate
-    formatted = deduplicate_events(formatted)
+    # Sort by timestamp descending (newest first)
+    items.sort(key=lambda x: x[1], reverse=True)
 
-    # Sort by date descending
-    formatted = sort_by_date_desc(formatted)
+    # Deduplicate by commit SHA (prefer event entry over commit search if same SHA)
+    seen_shas = set()
+    deduped = []
+    for line, ts, sha in items:
+        if sha and sha in seen_shas:
+            continue
+        if sha:
+            seen_shas.add(sha)
+        deduped.append((line, ts))
 
     # Suppress branch creation noise unless it's the only thing
-    has_other = any(not l.startswith("- Created branch") for l in formatted)
+    has_other = any(not l.startswith("- Created branch") for l, _ in deduped)
     if has_other:
-        formatted = [l for l in formatted if not l.startswith("- Created branch")]
+        deduped = [(l, ts) for l, ts in deduped if not l.startswith("- Created branch")]
 
-    if len(formatted) > MAX_ACTIVITIES:
-        formatted = formatted[:MAX_ACTIVITIES]
+    # Take top MAX_ACTIVITIES
+    top_items = deduped[:MAX_ACTIVITIES]
 
-    if not formatted:
+    if not top_items:
         return "_No recent public activity._"
 
-    return "\n".join(formatted)
+    return "\n".join(line for line, _ in top_items)
 
 
 def filter_repositories(repos: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -300,6 +314,16 @@ def filter_repositories(repos: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return filtered
 
 
+def sort_repositories_by_pushed_at(repos: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Sort repositories by pushed_at descending (newest first)."""
+    def get_push_time(repo: dict[str, Any]) -> datetime:
+        ts = parse_iso_timestamp(repo.get("pushed_at"))
+        # Use epoch as fallback so repos with missing/invalid timestamps sort to bottom
+        return ts if ts else datetime.min.replace(tzinfo=timezone.utc)
+
+    return sorted(repos, key=get_push_time, reverse=True)
+
+
 def format_repository(repo: dict[str, Any]) -> str:
     """Format a single repository as a markdown line."""
     name = repo.get("name", "")
@@ -307,11 +331,8 @@ def format_repository(repo: dict[str, Any]) -> str:
     description = repo.get("description") or "_No description_"
     stars = repo.get("stargazers_count", 0)
     pushed_at = repo.get("pushed_at", "")
-    try:
-        dt = datetime.fromisoformat(pushed_at.replace("Z", "+00:00"))
-        date_str = dt.strftime("%Y-%m-%d")
-    except Exception:
-        date_str = pushed_at[:10] if pushed_at else "?"
+    ts = parse_iso_timestamp(pushed_at)
+    date_str = ts.strftime("%Y-%m-%d") if ts else "?"
 
     parts = []
     parts.append(f"[{name}]({url})")
@@ -330,8 +351,11 @@ def build_repositories_section(repos: list[dict[str, Any]]) -> str:
     if not filtered:
         return "_No public repositories._"
 
+    # Sort by pushed_at descending explicitly
+    sorted_repos = sort_repositories_by_pushed_at(filtered)
+
     formatted = []
-    for r in filtered[:MAX_REPOSITORIES]:
+    for r in sorted_repos[:MAX_REPOSITORIES]:
         formatted.append(format_repository(r))
 
     return "\n".join(formatted)

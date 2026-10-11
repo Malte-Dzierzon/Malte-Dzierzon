@@ -3,7 +3,7 @@ name: Update Profile README
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 */6 * * *"  # Every 6 hours
+    - cron: "17 */6 * * *"  # Every 6 hours, offset to reduce congestion at hour boundaries
 
 permissions:
   contents: write

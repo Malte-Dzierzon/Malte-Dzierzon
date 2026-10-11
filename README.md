@@ -12,6 +12,7 @@
 - [dotfiles](https://github.com/Malte-Dzierzon/dotfiles) — my personal system setup  — 2026-10-11
 - [config-data](https://github.com/Malte-Dzierzon/config-data) — _No description_ — 2026-09-09
 - [omarchy-haven-theme](https://github.com/Malte-Dzierzon/omarchy-haven-theme) — Dark all-round Omarchy theme with a muted, readable palette that fits many wallpapers — 2026-09-06
+- [MTG-Multiverse-Studio](https://github.com/Malte-Dzierzon/MTG-Multiverse-Studio) — Local-first MTG terminal tool  | deck library, search, and live card images (Kitty). Rough prototype for learning Rust. — 2026-09-04
 <!-- REPOSITORIES ends -->
 
 </td>
@@ -24,7 +25,6 @@
 - PR #2 merged in [Malte-Dzierzon/dotfiles](https://github.com/Malte-Dzierzon/dotfiles) — 2026-10-09
 - PR #2 opened in [Malte-Dzierzon/dotfiles](https://github.com/Malte-Dzierzon/dotfiles) — 2026-10-09
 - PR #1 merged in [Malte-Dzierzon/dotfiles](https://github.com/Malte-Dzierzon/dotfiles) — 2026-10-07
-- PR #1 opened in [Malte-Dzierzon/dotfiles](https://github.com/Malte-Dzierzon/dotfiles) — 2026-10-05
 <!-- ACTIVITY ends -->
 
 </td>
