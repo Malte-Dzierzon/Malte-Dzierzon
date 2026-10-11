@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Update GitHub profile README with recent public activity.
+Update GitHub profile README with recent public activity and repositories.
 
-Uses GitHub REST API to fetch user events, filters for meaningful
+Uses GitHub REST API to fetch user events and repositories, filters for meaningful
 development activity, and injects into README between markers.
 """
 
@@ -12,11 +12,14 @@ import re
 import sys
 import urllib.error
 import urllib.request
+from datetime import datetime, timezone
 from typing import Any
 
 README_PATH = os.path.join(os.path.dirname(__file__), "..", "README.md")
 ACTIVITY_MARKER = "ACTIVITY"
+REPOSITORIES_MARKER = "REPOSITORIES"
 MAX_ACTIVITIES = 5
+MAX_REPOSITORIES = 3
 GITHUB_API = "https://api.github.com"
 USER = "Malte-Dzierzon"
 REPO = "Malte-Dzierzon"  # profile repo name, to exclude self-updates
@@ -34,7 +37,7 @@ def write_readme(content: str) -> None:
 
 def validate_markers(content: str) -> None:
     """Ensure each marker pair exists exactly once."""
-    for marker in (ACTIVITY_MARKER,):
+    for marker in (ACTIVITY_MARKER, REPOSITORIES_MARKER):
         starts = content.count(f"<!-- {marker} starts -->")
         ends = content.count(f"<!-- {marker} ends -->")
         if starts != 1 or ends != 1:
@@ -51,10 +54,9 @@ def replace_section(content: str, marker: str, new_content: str) -> str:
     return pattern.sub(replacement, content)
 
 
-def fetch_events(token: str | None) -> list[dict[str, Any]]:
-    """Fetch public events for the user from GitHub API."""
-    url = f"{GITHUB_API}/users/{USER}/events/public?per_page=100"
-    headers = {"Accept": "application/vnd.github+json", "User-Agent": "profile-readme-updater"}
+def fetch_json(url: str, token: str | None, accept: str = "application/vnd.github+json") -> Any:
+    """Fetch and parse JSON from GitHub API."""
+    headers = {"Accept": accept, "User-Agent": "profile-readme-updater"}
     if token:
         headers["Authorization"] = f"Bearer {token}"
 
@@ -67,13 +69,24 @@ def fetch_events(token: str | None) -> list[dict[str, Any]]:
                 raise RuntimeError(f"GitHub API returned {resp.status}")
     except urllib.error.HTTPError as e:
         if e.code == 403:
-            # Rate limited
             reset = e.headers.get("X-RateLimit-Reset")
             wait = int(reset) - int(datetime.now(timezone.utc).timestamp()) if reset else 60
             raise RuntimeError(f"Rate limited. Reset in ~{wait}s") from e
         raise RuntimeError(f"GitHub API error: {e.code} {e.reason}") from e
     except urllib.error.URLError as e:
         raise RuntimeError(f"Network error: {e.reason}") from e
+
+
+def fetch_events(token: str | None) -> list[dict[str, Any]]:
+    """Fetch public events for the user from GitHub API."""
+    url = f"{GITHUB_API}/users/{USER}/events/public?per_page=100"
+    return fetch_json(url, token)
+
+
+def fetch_repositories(token: str | None) -> list[dict[str, Any]]:
+    """Fetch public repositories for the user from GitHub API."""
+    url = f"{GITHUB_API}/users/{USER}/repos?per_page=100&sort=pushed&direction=desc"
+    return fetch_json(url, token)
 
 
 def is_meaningful_event(event: dict[str, Any]) -> bool:
@@ -117,9 +130,8 @@ def format_event(event: dict[str, Any]) -> str | None:
         commits = payload.get("commits", [])
         if not commits:
             return None
-        # Use the most recent commit message
         msg = commits[-1].get("message", "").split("\n")[0].strip()
-        msg = msg[:80]  # truncate long messages
+        msg = msg[:80]
         commit_sha = commits[-1].get("sha", "")[:7]
         commit_url = f"{repo_url}/commit/{commit_sha}"
         return f"- [{repo_name}]({repo_url}) — {msg} ([{commit_sha}]({commit_url})) — {date_str}"
@@ -175,6 +187,21 @@ def format_event(event: dict[str, Any]) -> str | None:
     return None
 
 
+def deduplicate_events(formatted: list[str]) -> list[str]:
+    """Remove duplicate or near-duplicate event lines."""
+    seen = set()
+    result = []
+    for line in formatted:
+        # Normalize for comparison: strip date, commit sha
+        normalized = re.sub(r"\([^)]+\) — \d{4}-\d{2}-\d{2}$", "", line)
+        normalized = re.sub(r"— \d{4}-\d{2}-\d{2}$", "", normalized)
+        normalized = normalized.strip()
+        if normalized not in seen:
+            seen.add(normalized)
+            result.append(line)
+    return result
+
+
 def build_activity_section(events: list[dict[str, Any]]) -> str:
     """Build the activity markdown section."""
     meaningful = [e for e in events if is_meaningful_event(e)]
@@ -183,11 +210,74 @@ def build_activity_section(events: list[dict[str, Any]]) -> str:
         line = format_event(e)
         if line:
             formatted.append(line)
-        if len(formatted) >= MAX_ACTIVITIES:
-            break
+
+    # Deduplicate
+    formatted = deduplicate_events(formatted)
+
+    # Suppress branch creation noise unless it's the only thing
+    has_other = any(not l.startswith("- Created branch") for l in formatted)
+    if has_other:
+        formatted = [l for l in formatted if not l.startswith("- Created branch")]
+
+    if len(formatted) > MAX_ACTIVITIES:
+        formatted = formatted[:MAX_ACTIVITIES]
 
     if not formatted:
         return "_No recent public activity._"
+
+    return "\n".join(formatted)
+
+
+def filter_repositories(repos: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Filter out forks, archived repos, and the profile repo itself."""
+    filtered = []
+    for r in repos:
+        if r.get("fork"):
+            continue
+        if r.get("archived"):
+            continue
+        if r.get("name") == REPO:
+            continue
+        filtered.append(r)
+    return filtered
+
+
+def format_repository(repo: dict[str, Any]) -> str:
+    """Format a single repository as a markdown line."""
+    name = repo.get("name", "")
+    url = repo.get("html_url", f"https://github.com/{USER}/{name}")
+    description = repo.get("description") or "_No description_"
+    language = repo.get("language") or ""
+    stars = repo.get("stargazers_count", 0)
+    pushed_at = repo.get("pushed_at", "")
+    try:
+        dt = datetime.fromisoformat(pushed_at.replace("Z", "+00:00"))
+        date_str = dt.strftime("%Y-%m-%d")
+    except Exception:
+        date_str = pushed_at[:10] if pushed_at else "?"
+
+    parts = []
+    parts.append(f"[{name}]({url})")
+    if description:
+        parts.append(f"— {description}")
+    if language:
+        parts.append(f"[{language}]")
+    if stars:
+        parts.append(f"⭐ {stars}")
+    parts.append(f"— {date_str}")
+
+    return f"- {' '.join(parts)}"
+
+
+def build_repositories_section(repos: list[dict[str, Any]]) -> str:
+    """Build the repositories markdown section."""
+    filtered = filter_repositories(repos)
+    if not filtered:
+        return "_No public repositories._"
+
+    formatted = []
+    for r in filtered[:MAX_REPOSITORIES]:
+        formatted.append(format_repository(r))
 
     return "\n".join(formatted)
 
@@ -199,10 +289,15 @@ def main() -> int:
         readme = read_readme()
         validate_markers(readme)
 
+        # Fetch both events and repositories
         events = fetch_events(token)
+        repos = fetch_repositories(token)
+
         activity_md = build_activity_section(events)
+        repos_md = build_repositories_section(repos)
 
         readme = replace_section(readme, ACTIVITY_MARKER, activity_md)
+        readme = replace_section(readme, REPOSITORIES_MARKER, repos_md)
 
         if readme != open(README_PATH, "r", encoding="utf-8").read():
             write_readme(readme)
