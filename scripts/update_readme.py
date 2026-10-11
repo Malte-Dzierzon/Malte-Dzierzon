@@ -2,7 +2,7 @@
 """
 Update GitHub profile README with recent public activity and repositories.
 
-Uses GitHub REST API to fetch user events and repositories, filters for meaningful
+Uses GitHub REST API to fetch user events, commits, and repositories, filters for meaningful
 development activity, and injects into README between markers.
 """
 
@@ -87,6 +87,20 @@ def fetch_repositories(token: str | None) -> list[dict[str, Any]]:
     """Fetch public repositories for the user from GitHub API."""
     url = f"{GITHUB_API}/users/{USER}/repos?per_page=100&sort=pushed&direction=desc"
     return fetch_json(url, token)
+
+
+def fetch_commits(token: str | None) -> list[dict[str, Any]]:
+    """Fetch recent commits by the user across all public repositories."""
+    # Search commits by author, excluding the profile repo
+    url = (
+        f"{GITHUB_API}/search/commits"
+        f"?q=author:{USER}+-repo:{USER}/{REPO}"
+        f"&per_page=30&sort=committer-date&order=desc"
+    )
+    # Commits search requires a preview Accept header
+    accept = "application/vnd.github.cloak-preview"
+    data = fetch_json(url, token, accept=accept)
+    return data.get("items", [])
 
 
 def is_meaningful_event(event: dict[str, Any]) -> bool:
@@ -187,6 +201,30 @@ def format_event(event: dict[str, Any]) -> str | None:
     return None
 
 
+def format_commit(commit: dict[str, Any]) -> str | None:
+    """Format a commit from search API as a markdown line."""
+    sha = commit.get("sha", "")
+    commit_url = commit.get("html_url", "")
+    repo = commit.get("repository", {})
+    repo_name = repo.get("full_name", "")
+    repo_url = repo.get("html_url", f"https://github.com/{repo_name}")
+    message = commit.get("commit", {}).get("message", "").split("\n")[0].strip()
+    message = message[:80]
+    date_str = commit.get("commit", {}).get("committer", {}).get("date", "")
+    try:
+        dt = datetime.fromisoformat(date_str.replace("Z", "+00:00"))
+        date_str = dt.strftime("%Y-%m-%d")
+    except Exception:
+        date_str = date_str[:10] if date_str else "?"
+
+    # Exclude profile repo
+    if repo_name == f"{USER}/{REPO}":
+        return None
+
+    short_sha = sha[:7]
+    return f"- [{repo_name}]({repo_url}) — {message} ([{short_sha}]({commit_url})) — {date_str}"
+
+
 def deduplicate_events(formatted: list[str]) -> list[str]:
     """Remove duplicate or near-duplicate event lines."""
     seen = set()
@@ -202,17 +240,37 @@ def deduplicate_events(formatted: list[str]) -> list[str]:
     return result
 
 
-def build_activity_section(events: list[dict[str, Any]]) -> str:
-    """Build the activity markdown section."""
+def sort_by_date_desc(lines: list[str]) -> list[str]:
+    """Sort markdown lines by date (YYYY-MM-DD at end) descending."""
+    def extract_date(line: str) -> str:
+        match = re.search(r"(\d{4}-\d{2}-\d{2})$", line)
+        return match.group(1) if match else "0000-00-00"
+
+    return sorted(lines, key=extract_date, reverse=True)
+
+
+def build_activity_section(events: list[dict[str, Any]], commits: list[dict[str, Any]]) -> str:
+    """Build the activity markdown section from events and commits."""
     meaningful = [e for e in events if is_meaningful_event(e)]
     formatted = []
+
+    # Format events
     for e in meaningful:
         line = format_event(e)
         if line:
             formatted.append(line)
 
+    # Format commits
+    for c in commits:
+        line = format_commit(c)
+        if line:
+            formatted.append(line)
+
     # Deduplicate
     formatted = deduplicate_events(formatted)
+
+    # Sort by date descending
+    formatted = sort_by_date_desc(formatted)
 
     # Suppress branch creation noise unless it's the only thing
     has_other = any(not l.startswith("- Created branch") for l in formatted)
@@ -247,7 +305,6 @@ def format_repository(repo: dict[str, Any]) -> str:
     name = repo.get("name", "")
     url = repo.get("html_url", f"https://github.com/{USER}/{name}")
     description = repo.get("description") or "_No description_"
-    language = repo.get("language") or ""
     stars = repo.get("stargazers_count", 0)
     pushed_at = repo.get("pushed_at", "")
     try:
@@ -260,8 +317,6 @@ def format_repository(repo: dict[str, Any]) -> str:
     parts.append(f"[{name}]({url})")
     if description:
         parts.append(f"— {description}")
-    if language:
-        parts.append(f"[{language}]")
     if stars:
         parts.append(f"⭐ {stars}")
     parts.append(f"— {date_str}")
@@ -289,11 +344,12 @@ def main() -> int:
         readme = read_readme()
         validate_markers(readme)
 
-        # Fetch both events and repositories
+        # Fetch events, repositories, and commits
         events = fetch_events(token)
         repos = fetch_repositories(token)
+        commits = fetch_commits(token)
 
-        activity_md = build_activity_section(events)
+        activity_md = build_activity_section(events, commits)
         repos_md = build_repositories_section(repos)
 
         readme = replace_section(readme, ACTIVITY_MARKER, activity_md)
