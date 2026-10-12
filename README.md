@@ -4,7 +4,7 @@
 <tr>
 <td valign="top">
 
-$ whoami --recent
+git log -4
 
 <!-- ACTIVITY starts -->
 - [Malte-Dzierzon/dotfiles](https://github.com/Malte-Dzierzon/dotfiles) — Revise README for clarity and updates ([e1533b4](https://github.com/Malte-Dzierzon/dotfiles/commit/e1533b4014a565a2e36228513c4fd9bcc5863260)) — 2026-10-11
@@ -18,7 +18,7 @@ $ whoami --recent
 <tr>
 <td valign="top">
 
-$ ls --featured
+eza ~/projects
 
 <!-- REPOSITORIES starts -->
 - [dotfiles](https://github.com/Malte-Dzierzon/dotfiles) — my personal system setup — 2026-10-11
