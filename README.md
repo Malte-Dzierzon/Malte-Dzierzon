@@ -30,7 +30,6 @@ $ ls --featured
 </tr>
 </table>
 
-- [Discord](https://discord.com/user/1029271091899809852)
-- [Steam](https://steamcommunity.com/id/xealom/)
-- [YouTube](https://www.youtube.com/@Xealom)
-- [TikTok](https://www.tiktok.com/@maltedz)
+# — — — — — — — — — — — — — — — —
+
+[Social Media Links](https://github.com/Malte-Dzierzon)
