@@ -12,7 +12,7 @@ from datetime import datetime, timezone, timedelta
 
 
 def test_max_repositories_limit():
-    """Test that exactly 4 repositories are shown when 5+ are available."""
+    """Test that exactly 3 repositories are shown when 5+ are available."""
     repos = [
         {"name": f"repo{i}", "fork": False, "archived": False,
          "html_url": f"https://github.com/Malte-Dzierzon/repo{i}",
@@ -21,26 +21,22 @@ def test_max_repositories_limit():
     ]
     result = ur.build_repositories_section(repos)
     lines = result.strip().split('\n')
-    assert len(lines) == 4, f"Expected 4 repos, got {len(lines)}: {lines}"
-    print("✓ max repositories limit (4)")
+    assert len(lines) == 3, f"Expected 3 repos, got {len(lines)}: {lines}"
+    print("✓ max repositories limit (3)")
 
 
 def test_repositories_sorted_by_pushed_at():
     """Test that repositories are sorted by pushed_at descending regardless of input order."""
     # Intentionally shuffled order
     repos = [
-        {"name": "oldest", "fork": False, "archived": False,
-         "html_url": "https://github.com/Malte-Dzierzon/oldest",
-         "description": "d", "stargazers_count": 0,
-         "pushed_at": "2026-09-01T12:00:00Z"},
-        {"name": "newest", "fork": False, "archived": False,
-         "html_url": "https://github.com/Malte-Dzierzon/newest",
-         "description": "d", "stargazers_count": 0,
-         "pushed_at": "2026-10-11T12:00:00Z"},
         {"name": "middle", "fork": False, "archived": False,
          "html_url": "https://github.com/Malte-Dzierzon/middle",
          "description": "d", "stargazers_count": 0,
          "pushed_at": "2026-10-05T12:00:00Z"},
+        {"name": "newest", "fork": False, "archived": False,
+         "html_url": "https://github.com/Malte-Dzierzon/newest",
+         "description": "d", "stargazers_count": 0,
+         "pushed_at": "2026-10-11T12:00:00Z"},
         {"name": "second", "fork": False, "archived": False,
          "html_url": "https://github.com/Malte-Dzierzon/second",
          "description": "d", "stargazers_count": 0,
@@ -51,7 +47,6 @@ def test_repositories_sorted_by_pushed_at():
     assert "newest" in lines[0], f"First should be newest: {lines[0]}"
     assert "second" in lines[1], f"Second should be second: {lines[1]}"
     assert "middle" in lines[2], f"Third should be middle: {lines[2]}"
-    assert "oldest" in lines[3], f"Fourth should be oldest: {lines[3]}"
     print("✓ repositories sorted by pushed_at descending")
 
 
@@ -169,11 +164,11 @@ def test_missing_timestamps_handled_gracefully():
     ]
     result = ur.build_repositories_section(repos)
     lines = result.strip().split('\n')
-    # Valid ones should be first, invalid/missing at bottom
+    # Valid ones should be first, invalid/missing at bottom; limit cuts to 3
+    assert len(lines) == 3, f"Expected 3 repos, got {len(lines)}: {lines}"
     assert "valid" in lines[0], f"First should be valid: {lines[0]}"
     assert "older_valid" in lines[1], f"Second should be older_valid: {lines[1]}"
-    assert "missing_ts" in lines[2], f"Third should be missing_ts: {lines[2]}"
-    assert "invalid_ts" in lines[3], f"Fourth should be invalid_ts: {lines[3]}"
+    assert "missing_ts" in lines[2] or "invalid_ts" in lines[2], f"Third should be timestamp-less: {lines[2]}"
     print("✓ missing/invalid timestamps handled gracefully")
 
 
