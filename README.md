@@ -4,7 +4,7 @@
 <tr>
 <td valign="top" width="50%">
 
-## Recently repositories
+## Recently active repositories
 
 <!-- REPOSITORIES starts -->
 - [dotfiles](https://github.com/Malte-Dzierzon/dotfiles) — my personal system setup  — 2026-10-11
