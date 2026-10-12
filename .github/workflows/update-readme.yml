@@ -3,10 +3,19 @@ name: Update Profile README
 on:
   workflow_dispatch:
   schedule:
-    - cron: "17 */6 * * *"  # Every 6 hours, offset to reduce congestion at hour boundaries
+    - cron: "17 */6 * * *"
+  push:
+    branches: [main]
+    paths:
+      - "scripts/update_readme.py"
+      - ".github/workflows/update-readme.yml"
 
 permissions:
   contents: write
+
+concurrency:
+  group: readme-update
+  cancel-in-progress: false
 
 jobs:
   update:
@@ -25,13 +34,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python scripts/update_readme.py
-          cat README.md
+          git diff --stat README.md || true
 
       - name: Commit and push if changed
         run: |
-          git config --global user.email "actions@users.noreply.github.com"
-          git config --global user.name "README-bot"
-          git diff --quiet && exit 0
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git diff --quiet -- README.md && echo "No changes, skipping commit." && exit 0
           git add README.md
           git commit -m "Update recent activity"
+          git pull --rebase origin main
           git push
