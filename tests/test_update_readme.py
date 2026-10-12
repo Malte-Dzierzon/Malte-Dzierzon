@@ -12,42 +12,60 @@ from datetime import datetime, timezone, timedelta
 
 
 def test_max_repositories_limit():
-    """Test that exactly 3 repositories are shown when 5+ are available."""
+    """Test that exactly 4 repositories are shown when 5+ are available (stars fallback)."""
     repos = [
         {"name": f"repo{i}", "fork": False, "archived": False,
          "html_url": f"https://github.com/Malte-Dzierzon/repo{i}",
          "description": f"Description {i}", "stargazers_count": i,
-         "pushed_at": f"2026-10-{10-i}T12:00:00Z"} for i in range(5)
+         "pushed_at": f"2026-10-{10-i:02d}T12:00:00Z"} for i in range(5)
     ]
-    result = ur.build_repositories_section(repos)
+    result = ur.build_repositories_section(repos, [])
     lines = result.strip().split('\n')
-    assert len(lines) == 3, f"Expected 3 repos, got {len(lines)}: {lines}"
-    print("✓ max repositories limit (3)")
+    assert len(lines) == 4, f"Expected 4 repos, got {len(lines)}: {lines}"
+    print("✓ max repositories limit (4)")
 
 
-def test_repositories_sorted_by_pushed_at():
-    """Test that repositories are sorted by pushed_at descending regardless of input order."""
-    # Intentionally shuffled order
+def test_repositories_sorted_by_stars():
+    """Test fallback sorts by stars desc, then pushed_at desc."""
     repos = [
-        {"name": "middle", "fork": False, "archived": False,
-         "html_url": "https://github.com/Malte-Dzierzon/middle",
-         "description": "d", "stargazers_count": 0,
-         "pushed_at": "2026-10-05T12:00:00Z"},
-        {"name": "newest", "fork": False, "archived": False,
-         "html_url": "https://github.com/Malte-Dzierzon/newest",
+        {"name": "old-star", "fork": False, "archived": False,
+         "html_url": "https://github.com/Malte-Dzierzon/old-star",
+         "description": "d", "stargazers_count": 5,
+         "pushed_at": "2026-10-01T12:00:00Z"},
+        {"name": "new-nostar", "fork": False, "archived": False,
+         "html_url": "https://github.com/Malte-Dzierzon/new-nostar",
          "description": "d", "stargazers_count": 0,
          "pushed_at": "2026-10-11T12:00:00Z"},
-        {"name": "second", "fork": False, "archived": False,
-         "html_url": "https://github.com/Malte-Dzierzon/second",
-         "description": "d", "stargazers_count": 0,
-         "pushed_at": "2026-10-10T12:00:00Z"},
+        {"name": "mid-star", "fork": False, "archived": False,
+         "html_url": "https://github.com/Malte-Dzierzon/mid-star",
+         "description": "d", "stargazers_count": 2,
+         "pushed_at": "2026-10-05T12:00:00Z"},
     ]
-    result = ur.build_repositories_section(repos)
+    result = ur.build_repositories_section(repos, [])
     lines = result.strip().split('\n')
-    assert "newest" in lines[0], f"First should be newest: {lines[0]}"
-    assert "second" in lines[1], f"Second should be second: {lines[1]}"
-    assert "middle" in lines[2], f"Third should be middle: {lines[2]}"
-    print("✓ repositories sorted by pushed_at descending")
+    assert "old-star" in lines[0], f"First should be old-star: {lines[0]}"
+    assert "mid-star" in lines[1], f"Second should be mid-star: {lines[1]}"
+    assert "new-nostar" in lines[2], f"Third should be new-nostar: {lines[2]}"
+    print("✓ repositories sorted by stars desc, pushed_at tiebreak")
+
+
+def test_pinned_preferred_over_stars():
+    """Test pinned repos come first, stars fallback fills remaining slots."""
+    repos = [
+        {"name": "popular", "fork": False, "archived": False,
+         "html_url": "https://github.com/Malte-Dzierzon/popular",
+         "description": "d", "stargazers_count": 99,
+         "pushed_at": "2026-10-11T12:00:00Z"},
+    ]
+    pinned = [
+        {"name": "pinned-one", "html_url": "https://github.com/Malte-Dzierzon/pinned-one",
+         "description": "p", "stargazers_count": 0, "pushed_at": "2026-01-01T00:00:00Z"},
+    ]
+    result = ur.build_repositories_section(repos, pinned)
+    lines = result.strip().split('\n')
+    assert "pinned-one" in lines[0], f"Pinned should be first: {lines[0]}"
+    assert "popular" in lines[1], f"Fallback should fill up: {lines[1]}"
+    print("✓ pinned first, stars fallback fills up")
 
 
 def test_filter_excludes_forks_archived_profile():
@@ -70,7 +88,7 @@ def test_filter_excludes_forks_archived_profile():
          "description": "valid", "stargazers_count": 0,
          "pushed_at": "2026-10-09T12:00:00Z"},
     ]
-    result = ur.build_repositories_section(repos)
+    result = ur.build_repositories_section(repos, [])
     lines = result.strip().split('\n')
     assert len(lines) == 1, f"Expected 1 valid repo, got {len(lines)}: {lines}"
     assert "valid-repo" in lines[0], f"Expected valid-repo: {lines[0]}"
@@ -162,10 +180,10 @@ def test_missing_timestamps_handled_gracefully():
          "description": "d", "stargazers_count": 0,
          "pushed_at": "2026-09-01T12:00:00Z"},
     ]
-    result = ur.build_repositories_section(repos)
+    result = ur.build_repositories_section(repos, [])
     lines = result.strip().split('\n')
-    # Valid ones should be first, invalid/missing at bottom; limit cuts to 3
-    assert len(lines) == 3, f"Expected 3 repos, got {len(lines)}: {lines}"
+    # Valid ones should be first, invalid/missing at bottom; limit cuts to 4
+    assert len(lines) == 4, f"Expected 4 repos, got {len(lines)}: {lines}"
     assert "valid" in lines[0], f"First should be valid: {lines[0]}"
     assert "older_valid" in lines[1], f"Second should be older_valid: {lines[1]}"
     assert "missing_ts" in lines[2] or "invalid_ts" in lines[2], f"Third should be timestamp-less: {lines[2]}"
@@ -190,8 +208,8 @@ def test_idempotent_generation():
     result2 = ur.build_activity_section(events, [])
     assert result1 == result2, "Activity section not idempotent"
 
-    result1 = ur.build_repositories_section(repos)
-    result2 = ur.build_repositories_section(repos)
+    result1 = ur.build_repositories_section(repos, [])
+    result2 = ur.build_repositories_section(repos, [])
     assert result1 == result2, "Repositories section not idempotent"
     print("✓ idempotent generation")
 
@@ -218,7 +236,7 @@ def test_actual_api_data():
          "stargazers_count": 0,
          "pushed_at": "2026-09-09T22:08:20Z"},
     ]
-    result = ur.build_repositories_section(repos)
+    result = ur.build_repositories_section(repos, [])
     lines = result.strip().split('\n')
     assert len(lines) == 2
     assert "dotfiles" in lines[0]
@@ -264,7 +282,8 @@ def test_branch_creation_kept_when_only_activity():
 def run_all_tests():
     """Run all tests."""
     test_max_repositories_limit()
-    test_repositories_sorted_by_pushed_at()
+    test_repositories_sorted_by_stars()
+    test_pinned_preferred_over_stars()
     test_filter_excludes_forks_archived_profile()
     test_max_activities_limit()
     test_activities_sorted_by_exact_timestamp()

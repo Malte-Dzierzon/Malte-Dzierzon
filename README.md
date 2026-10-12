@@ -4,12 +4,13 @@
 <tr>
 <td valign="top" width="50%">
 
-## Recently active repositories
+## Featured repositories
 
 <!-- REPOSITORIES starts -->
 - [dotfiles](https://github.com/Malte-Dzierzon/dotfiles) — my personal system setup  — 2026-10-11
-- [config-data](https://github.com/Malte-Dzierzon/config-data) — _No description_ — 2026-09-09
+- [Informatik-Projekt-August-Malte](https://github.com/Malte-Dzierzon/Informatik-Projekt-August-Malte) — Training a neural network to recognize pyramids based on the vertices ⭐ 2 — 2026-09-01
 - [omarchy-haven-theme](https://github.com/Malte-Dzierzon/omarchy-haven-theme) — Dark all-round Omarchy theme with a muted, readable palette that fits many wallpapers — 2026-09-06
+- [config-data](https://github.com/Malte-Dzierzon/config-data) — _No description_ — 2026-09-09
 <!-- REPOSITORIES ends -->
 
 </td>

@@ -83,6 +83,49 @@ def fetch_events(token: str | None) -> list[dict[str, Any]]:
     return fetch_json(url, token)
 
 
+def fetch_graphql(query: str, token: str) -> Any:
+    """POST a GraphQL query. Raises on network/API errors."""
+    data = json.dumps({"query": query}).encode()
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+        "User-Agent": "profile-readme-updater",
+    }
+    req = urllib.request.Request(f"{GITHUB_API}/graphql", data=data, headers=headers)
+    with urllib.request.urlopen(req, timeout=30) as resp:
+        result = json.load(resp)
+    if "errors" in result:
+        raise RuntimeError(f"GraphQL errors: {result['errors']}")
+    return result.get("data")
+
+
+def fetch_pinned_repositories(token: str | None) -> list[dict[str, Any]]:
+    """Fetch pinned repositories via GraphQL. Returns [] without token or on error."""
+    if not token:
+        return []
+    query = (
+        f"query {{ user(login: \"{USER}\") "
+        "{ pinnedItems(first: 6, types: REPOSITORY) "
+        "{ nodes { ... on Repository "
+        "{ name description url stargazers { totalCount } pushedAt } } } } }"
+    )
+    try:
+        data = fetch_graphql(query, token)
+        nodes = data["user"]["pinnedItems"]["nodes"]
+    except Exception:
+        return []
+    repos = []
+    for n in nodes:
+        repos.append({
+            "name": n.get("name", ""),
+            "html_url": n.get("url", f"https://github.com/{USER}/{n.get('name', '')}"),
+            "description": n.get("description"),
+            "stargazers_count": (n.get("stargazers") or {}).get("totalCount", 0),
+            "pushed_at": n.get("pushedAt", ""),
+        })
+    return [r for r in repos if r["name"] != REPO]
+
+
 def fetch_repositories(token: str | None) -> list[dict[str, Any]]:
     """Fetch public repositories for the user from GitHub API."""
     # Fetch all repos without relying on API sort; we'll sort explicitly
@@ -102,6 +145,17 @@ def fetch_commits(token: str | None) -> list[dict[str, Any]]:
     accept = "application/vnd.github.cloak-preview"
     data = fetch_json(url, token, accept=accept)
     return data.get("items", [])
+
+
+
+def sort_repositories_by_stars(repos: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Sort repositories by stars desc, then pushed_at desc."""
+    def key(repo: dict[str, Any]) -> tuple:
+        ts = parse_iso_timestamp(repo.get("pushed_at"))
+        ts = ts if ts else datetime.min.replace(tzinfo=timezone.utc)
+        return (repo.get("stargazers_count", 0), ts)
+
+    return sorted(repos, key=key, reverse=True)
 
 
 def parse_iso_timestamp(ts: str | None) -> datetime | None:
@@ -345,17 +399,19 @@ def format_repository(repo: dict[str, Any]) -> str:
     return f"- {' '.join(parts)}"
 
 
-def build_repositories_section(repos: list[dict[str, Any]]) -> str:
-    """Build the repositories markdown section."""
-    filtered = filter_repositories(repos)
-    if not filtered:
+def build_repositories_section(repos: list[dict[str, Any]], pinned: list[dict[str, Any]]) -> str:
+    """Build the repositories markdown section: pinned first, stars fallback fills up."""
+    chosen = list(pinned[:MAX_REPOSITORIES])
+    if len(chosen) < MAX_REPOSITORIES:
+        filtered = filter_repositories(repos)
+        pinned_names = {r.get("name") for r in chosen}
+        rest = [r for r in filtered if r.get("name") not in pinned_names]
+        chosen += sort_repositories_by_stars(rest)[:MAX_REPOSITORIES - len(chosen)]
+    if not chosen:
         return "_No public repositories._"
 
-    # Sort by pushed_at descending explicitly
-    sorted_repos = sort_repositories_by_pushed_at(filtered)
-
     formatted = []
-    for r in sorted_repos[:MAX_REPOSITORIES]:
+    for r in chosen:
         formatted.append(format_repository(r))
 
     return "\n".join(formatted)
@@ -368,13 +424,14 @@ def main() -> int:
         readme = read_readme()
         validate_markers(readme)
 
-        # Fetch events, repositories, and commits
+        # Fetch events, repositories, commits, and pinned repos
         events = fetch_events(token)
         repos = fetch_repositories(token)
         commits = fetch_commits(token)
+        pinned = fetch_pinned_repositories(token)
 
         activity_md = build_activity_section(events, commits)
-        repos_md = build_repositories_section(repos)
+        repos_md = build_repositories_section(repos, pinned)
 
         readme = replace_section(readme, ACTIVITY_MARKER, activity_md)
         readme = replace_section(readme, REPOSITORIES_MARKER, repos_md)
