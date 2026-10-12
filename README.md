@@ -30,6 +30,6 @@ $ ls --featured
 </tr>
 </table>
 
-# — — — — — — — — — — — — — — — —
 
-[Social Media Links](https://github.com/Malte-Dzierzon)
+
+-> [Social Media Links](https://github.com/Malte-Dzierzon)
