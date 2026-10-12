@@ -393,7 +393,7 @@ def format_repository(repo: dict[str, Any]) -> str:
     if description:
         parts.append(f"— {description}")
     if stars:
-        parts.append(f"⭐ {stars}")
+        parts.append(f"({stars} ★)")
     parts.append(f"— {date_str}")
 
     return f"- {' '.join(parts)}"
