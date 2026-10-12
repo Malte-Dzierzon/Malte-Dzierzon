@@ -32,4 +32,4 @@ xealomnixos~ eza ~/projects
 
 
 
--> [Social Media Links](https://github.com/Malte-Dzierzon)
+-> [Social Media Links](https://drift.rip/Xealom)
