@@ -7,10 +7,10 @@
 xealomnixos~ git log -4
 
 <!-- ACTIVITY starts -->
+- [Malte-Dzierzon/dotfiles](https://github.com/Malte-Dzierzon/dotfiles) — system-backup: add user app inventory + rescue custom scripts ([1b603e0](https://github.com/Malte-Dzierzon/dotfiles/commit/1b603e0ff60037934906e848e5147d9407c7efbb)) — 2026-10-14
 - [Malte-Dzierzon/dotfiles](https://github.com/Malte-Dzierzon/dotfiles) — redesign: per-app catalog replaces desktop group; app-list command; NIX_PATH-independent catalog eval ([88efff0](https://github.com/Malte-Dzierzon/dotfiles/commit/88efff0e7dbe71deecf667e3864a1f0a217891b2)) — 2026-10-14
+- [Malte-Dzierzon/dotfiles](https://github.com/Malte-Dzierzon/dotfiles) — headless mode, herdr theme, eza aliases, remote access (ssh+tailscale) ([1d359a8](https://github.com/Malte-Dzierzon/dotfiles/commit/1d359a8343b89842da38964d041ced90308783c6)) — 2026-10-12
 - [Malte-Dzierzon/dotfiles](https://github.com/Malte-Dzierzon/dotfiles) — Revise README for clarity and updates ([e1533b4](https://github.com/Malte-Dzierzon/dotfiles/commit/e1533b4014a565a2e36228513c4fd9bcc5863260)) — 2026-10-11
-- [Malte-Dzierzon/dotfiles](https://github.com/Malte-Dzierzon/dotfiles) — docs: stack-first README with collapsible sections ([f63aee3](https://github.com/Malte-Dzierzon/dotfiles/commit/f63aee34859c1fd4c05d46bdbce8d0a11255c4d7)) — 2026-10-11
-- [Malte-Dzierzon/dotfiles](https://github.com/Malte-Dzierzon/dotfiles) — docs: restore shield banners in README ([a587fdb](https://github.com/Malte-Dzierzon/dotfiles/commit/a587fdb28d1abf9884641b892e48ad909a72c8af)) — 2026-10-11
 <!-- ACTIVITY ends -->
 
 </td>
