@@ -8,9 +8,9 @@ xealomnixos~ git log -4
 
 <!-- ACTIVITY starts -->
 - [Malte-Dzierzon/dotfiles](https://github.com/Malte-Dzierzon/dotfiles) — system-backup: bootstrap without python, fix numbering + typo ([208d2db](https://github.com/Malte-Dzierzon/dotfiles/commit/208d2db53ea61ab36dd4abcf1b3a6c8e76e376b5)) — 2026-10-14
+- [Malte-Dzierzon/dotfiles](https://github.com/Malte-Dzierzon/dotfiles) — system-backup: structure audit + opencode bootstrap ([fe7d31e](https://github.com/Malte-Dzierzon/dotfiles/commit/fe7d31e58780af323b2bb2cf1014b7647ad99701)) — 2026-10-14
+- [Malte-Dzierzon/dotfiles](https://github.com/Malte-Dzierzon/dotfiles) — system-backup: portable cleanup — drop wrappers, fix default-app, prune runtime ([a33a99f](https://github.com/Malte-Dzierzon/dotfiles/commit/a33a99faeb7b6fe457d48c071ac9de43d892275b)) — 2026-10-14
 - [Malte-Dzierzon/dotfiles](https://github.com/Malte-Dzierzon/dotfiles) — system-backup: add user app inventory + rescue custom scripts ([1b603e0](https://github.com/Malte-Dzierzon/dotfiles/commit/1b603e0ff60037934906e848e5147d9407c7efbb)) — 2026-10-14
-- [Malte-Dzierzon/dotfiles](https://github.com/Malte-Dzierzon/dotfiles) — redesign: per-app catalog replaces desktop group; app-list command; NIX_PATH-independent catalog eval ([88efff0](https://github.com/Malte-Dzierzon/dotfiles/commit/88efff0e7dbe71deecf667e3864a1f0a217891b2)) — 2026-10-14
-- [Malte-Dzierzon/dotfiles](https://github.com/Malte-Dzierzon/dotfiles) — headless mode, herdr theme, eza aliases, remote access (ssh+tailscale) ([1d359a8](https://github.com/Malte-Dzierzon/dotfiles/commit/1d359a8343b89842da38964d041ced90308783c6)) — 2026-10-12
 <!-- ACTIVITY ends -->
 
 </td>
