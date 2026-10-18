@@ -23,7 +23,7 @@ USER = "Malte-Dzierzon"
 REPO = "Malte-Dzierzon"  # profile repo: excluded everywhere
 GITHUB_API = "https://api.github.com"
 # Fixed curation: pinned order mirrored, no auto-fill.
-FEATURED = ["dotfiles", "Informatik-Projekt-August-Malte", "omarchy-haven-theme"]
+FEATURED = ["dotfile-s", "Informatik-Projekt-August-Malte", "omarchy-haven-theme"]
 
 
 def read_readme() -> str:

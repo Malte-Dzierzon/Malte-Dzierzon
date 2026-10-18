@@ -3,7 +3,7 @@ name: Update Profile README
 on:
   workflow_dispatch:
   schedule:
-    - cron: "17 */6 * * *"
+    - cron: "17 8,20 * * *"
   push:
     branches: [main]
     paths:
