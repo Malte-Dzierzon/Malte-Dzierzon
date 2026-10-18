@@ -7,10 +7,10 @@
 xealomlinux~ git log -4
 
 <!-- ACTIVITY starts -->
+- [Malte-Dzierzon/dotfile-s](https://github.com/Malte-Dzierzon/dotfile-s) — Add web thumbnails for screenshots, make wallpaper section collapsible ([3e0fea2](https://github.com/Malte-Dzierzon/dotfile-s/commit/3e0fea2b0ba1c76e707b7b99969bbe16a3760d5f)) — 2026-10-18
+- [Malte-Dzierzon/dotfile-s](https://github.com/Malte-Dzierzon/dotfile-s) — Update README: add second screenshot, new wallpaper gallery, SUSE logo ([adab1c2](https://github.com/Malte-Dzierzon/dotfile-s/commit/adab1c2b6af46b5dc7b9e12d2ab7df527aff53be)) — 2026-10-18
 - [Malte-Dzierzon/dotfile-s](https://github.com/Malte-Dzierzon/dotfile-s) — Refactor: minimal personal dotfiles collection ([dc0e1bb](https://github.com/Malte-Dzierzon/dotfile-s/commit/dc0e1bb35346f43e0165e07dd588612dda127a4c)) — 2026-10-17
 - [Malte-Dzierzon/dotfile-s](https://github.com/Malte-Dzierzon/dotfile-s) — Reinstall-Stand: YaST passwortfrei, Limine, Snapshots aktuell, migration/ -\> docs/ ([3c70680](https://github.com/Malte-Dzierzon/dotfile-s/commit/3c70680f89d3bca3bad3ce1d47de401c8217f99f)) — 2026-10-15
-- [Malte-Dzierzon/utilmenu](https://github.com/Malte-Dzierzon/utilmenu) — panel v4: controlled input, hover-select, left/right nav, about sixel fix ([3897523](https://github.com/Malte-Dzierzon/utilmenu/commit/3897523fb4d9d299a0c5107417d7aa9db9107211)) — 2026-09-28
-- [Malte-Dzierzon/utilmenu](https://github.com/Malte-Dzierzon/utilmenu) — panel v3: global search, free backspace, hover-safe, icon alignment ([981ba1a](https://github.com/Malte-Dzierzon/utilmenu/commit/981ba1a11512f64fb4b047c79c4a0369c498b0a9)) — 2026-09-28
 <!-- ACTIVITY ends -->
 
 </td>
