@@ -4,7 +4,7 @@
 <tr>
 <td valign="top">
 
-xealomnixos~ git log -4
+xealomlinux~ git log -4
 
 <!-- ACTIVITY starts -->
 - [Malte-Dzierzon/dotfile-s](https://github.com/Malte-Dzierzon/dotfile-s) — Refactor: minimal personal dotfiles collection ([dc0e1bb](https://github.com/Malte-Dzierzon/dotfile-s/commit/dc0e1bb35346f43e0165e07dd588612dda127a4c)) — 2026-10-17
@@ -18,7 +18,7 @@ xealomnixos~ git log -4
 <tr>
 <td valign="top">
 
-xealomnixos~ eza ~/projects
+xealomlinux~ eza ~/projects
 
 <!-- REPOSITORIES starts -->
 - [dotfile-s](https://github.com/Malte-Dzierzon/dotfile-s) — my personal used linux setup — 2026-10-18
