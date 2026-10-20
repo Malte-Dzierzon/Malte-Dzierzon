@@ -1,77 +1,101 @@
 #!/usr/bin/env python3
-"""Update GitHub profile README: activity + featured repositories.
+"""Update the GitHub profile README: activity feed + featured repositories.
 
-Activity model: public Events API (PushEvent commits, merged PRs from
-PullRequestEvent, IssuesEvent) cross-checked against GraphQL
-contributionsCollection PR/issue nodes. Events carry exact timestamps and
-per-commit links; contributionsCollection only yields weekly aggregates
-without links, so it cannot drive the timeline alone.
+Design rules (kept deliberately small):
+
+- `featured.json` (repo root) lists the featured repositories. Entries pin the
+  immutable repository `id` (rename-proof); `name` is a fallback that can still
+  resolve a rename, because /repos/{owner}/{old-name} keeps redirecting after
+  a rename. Renames and deletions therefore never require edits to this file.
+- Every request goes through Gateway.get(): at most 3 attempts, exponential
+  backoff for transient failures (429, 403 secondary rate limit, 5xx, network
+  errors, malformed bodies), honoring Retry-After. Definitive errors
+  (400/401/404, permission 403) fail immediately without retry.
+- Section generation failures are recoverable: the affected section keeps its
+  previous content and a warning is emitted. Structural problems (missing or
+  duplicate README markers, invalid config) are critical and abort before
+  anything is written.
+- Output is generated fully in memory, validated, and only written atomically
+  (temp file + os.replace) when it differs from the current README. Identical
+  input data produces byte-identical output.
 """
+
+from __future__ import annotations
 
 import json
 import os
 import re
 import sys
+import time
+import traceback
 import urllib.error
 import urllib.request
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 
-README_PATH = os.path.join(os.path.dirname(__file__), "..", "README.md")
-MAX_ACTIVITIES = 4
+API = "https://api.github.com"
 USER = "Malte-Dzierzon"
-REPO = "Malte-Dzierzon"  # profile repo: excluded everywhere
-GITHUB_API = "https://api.github.com"
-# Fixed curation: pinned order mirrored, no auto-fill.
-FEATURED = ["dotfile-s", "Informatik-Projekt-August-Malte", "omarchy-haven-theme"]
+PROFILE_REPO = f"{USER}/{USER}"
+MAX_ACTIVITIES = 4   # lines shown in the activity panel
+MAX_LOOKUPS = 15     # commit-detail fetches per run (rate-limit budget)
+PAGES_CAP = 5        # pages per list endpoint
+ATTEMPTS = 3         # attempts per request
+RETRY_BASE = 1.0
+RETRY_MAX = 8.0
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+README_PATH = SCRIPT_DIR.parent / "README.md"
+FEATURED_CONFIG = SCRIPT_DIR.parent / "featured.json"
+
+SHA_RE = re.compile(r"[0-9a-f]{40}")
+SLUG_RE = re.compile(r"[A-Za-z0-9._-]+/[A-Za-z0-9._-]+")
+NAME_RE = re.compile(r"[A-Za-z0-9._-]+")
+ESCAPES = {"\\": "\\\\", "[": "\\[", "]": "\\]", "<": "\\<", ">": "\\>", "|": "\\|"}
+BACKSLASH_RE = re.compile(r"[\[\]<>|\\]")
+SPACE_RE = re.compile(r"\s+")
+
+SECTION_MARKERS = ("ACTIVITY", "REPOSITORIES")
 
 
-def read_readme() -> str:
-    with open(README_PATH, encoding="utf-8") as f:
-        return f.read()
+class CriticalError(Exception):
+    """Structural defect; abort the run without writing anything."""
 
 
-def replace_section(content: str, marker: str, new: str) -> str:
-    pattern = re.compile(
-        rf"(<!-- {marker} starts -->)\n.*?\n(<!-- {marker} ends -->)", re.DOTALL
-    )
-    matches = pattern.findall(content)
-    if len(matches) != 1:
-        raise ValueError(f"Marker {marker!r} must appear exactly once")
-    return pattern.sub(lambda m: f"{m.group(1)}\n{new}\n{m.group(2)}", content)
+class ApiError(Exception):
+    """A request failed; either definitively or after retries."""
 
 
-def api_get(url: str, token: str | None) -> Any:
-    headers = {"Accept": "application/vnd.github+json", "User-Agent": "profile-readme-updater"}
-    if token:
-        headers["Authorization"] = f"Bearer {token}"
-    req = urllib.request.Request(url, headers=headers)
-    try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            return json.load(resp)
-    except urllib.error.HTTPError as e:
-        raise RuntimeError(f"GitHub API error: {e.code} {e.reason}") from e
-    except urllib.error.URLError as e:
-        raise RuntimeError(f"Network error: {e.reason}") from e
+class _Transient(Exception):
+    def __init__(self, msg: str, after: float | None):
+        super().__init__(msg)
+        self.after = after
 
 
-def api_graphql(query: str, token: str) -> Any:
-    data = json.dumps({"query": query}).encode()
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json",
-        "User-Agent": "profile-readme-updater",
-    }
-    req = urllib.request.Request(f"{GITHUB_API}/graphql", data=data, headers=headers)
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        result = json.load(resp)
-    if "errors" in result:
-        raise RuntimeError(f"GraphQL errors: {result['errors']}")
-    return result.get("data")
+class _Definitive(Exception):
+    pass
 
 
-def ts(value: str | None) -> datetime | None:
-    if not value:
+def warn(msg: str) -> None:
+    """Surface recoverable failures without failing the run."""
+    prefix = "::warning::" if os.environ.get("GITHUB_ACTIONS") == "true" else "WARNING: "
+    print(f"{prefix}{msg}", file=sys.stderr, flush=True)
+
+
+def esc(text: Any) -> str:
+    """Escape markdown-significant characters.
+
+    Escaping '<' also neutralizes raw-HTML injections ('<svg>'), comment
+    starts ('<!--') and tags: GFM renders the escaped char literally.
+    """
+    if not isinstance(text, str):
+        return ""
+    t = BACKSLASH_RE.sub(lambda m: ESCAPES[m.group(0)], text)
+    return SPACE_RE.sub(" ", t).strip()
+
+
+def parse_ts(value: Any) -> datetime | None:
+    if not isinstance(value, str) or not value:
         return None
     try:
         return datetime.fromisoformat(value.replace("Z", "+00:00")).astimezone(timezone.utc)
@@ -79,139 +103,402 @@ def ts(value: str | None) -> datetime | None:
         return None
 
 
-def esc(text: str) -> str:
-    """Escape markdown-significant chars in remote descriptions/titles."""
-    return re.sub(r"([\[\]<>|])", r"\\\1", text.strip())
+def is_bot(login: Any) -> bool:
+    return isinstance(login, str) and login.endswith("[bot]")
 
 
-def is_bot(login: str) -> bool:
-    return login.endswith("[bot]") or login in ("github-actions[bot]", "dependabot[bot]")
-
-
-def head_commit(repo: str, sha: str, token: str | None) -> dict[str, Any]:
-    """Fetch head commit detail (message/author); PushEvent payloads omit commits."""
+def _retry_after(headers: Any) -> float | None:
     try:
-        return api_get(f"{GITHUB_API}/repos/{repo}/commits/{sha}", token)
-    except RuntimeError:
-        return {}
-
-def relevant_event(e: dict[str, Any]) -> bool:
-    if e.get("repo", {}).get("name") == f"{USER}/{REPO}":
-        return False
-    if is_bot(e.get("actor", {}).get("login", "")):
-        return False
-    if e.get("type") == "PullRequestEvent":
-        action = e.get("payload", {}).get("action", "")
-        merged = e.get("payload", {}).get("pull_request", {}).get("merged", False)
-        return action == "opened" or (action == "closed" and merged)
-    if e.get("type") == "IssuesEvent":
-        return e.get("payload", {}).get("action") == "opened"
-    return e.get("type") == "PushEvent"
+        return max(0.0, float(headers.get("Retry-After")))
+    except (AttributeError, TypeError, ValueError):
+        return None
 
 
-def fmt_push(e: dict[str, Any], token: str | None) -> tuple[str | None, datetime | None]:
-    repo = e.get("repo", {}).get("name", "")
-    repo_url = f"https://github.com/{repo}"
-    when = ts(e.get("created_at"))
-    if not when:
-        return None, None
-    sha = e.get("payload", {}).get("head", "")
-    if not sha:
-        return None, when
-    detail = head_commit(repo, sha, token)
-    message = (detail.get("commit", {}).get("message", "") or "").splitlines()
-    author = detail.get("author", {}) or {}
-    if is_bot(author.get("login", "")):
-        return None, when
-    short = sha[:7]
-    if message and message[0]:
-        return f"- [{repo}]({repo_url}) — {esc(message[0])} ([{short}]({repo_url}/commit/{sha})) — {when:%Y-%m-%d}", when
-    return f"- Push to [{repo}]({repo_url}) ([{short}]({repo_url}/commit/{sha})) — {when:%Y-%m-%d}", when
+def _request(url: str, token: str | None, timeout: int = 30) -> Any:
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "profile-readme-updater",
+    }
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    req = urllib.request.Request(url, headers=headers)
+    try:
+        resp = urllib.request.urlopen(req, timeout=timeout)
+    except urllib.error.HTTPError as e:
+        if e.code == 429 or e.code == 403 or 500 <= e.code < 600:
+            raise _Transient(f"HTTP {e.code} {e.reason}", _retry_after(e.headers)) from None
+        raise _Definitive(f"HTTP {e.code} {e.reason} for {url}") from None
+    except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
+        raise _Transient(f"network error: {e}", None) from None
+    with resp:
+        raw = resp.read()
+    try:
+        return json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as e:
+        raise _Transient(f"malformed body: {e}", None) from None
 
 
-def fmt_event(e: dict[str, Any], token: str | None) -> tuple[str | None, datetime | None]:
-    repo = e.get("repo", {}).get("name", "")
-    repo_url = f"https://github.com/{repo}"
-    when = ts(e.get("created_at"))
-    etype = e.get("type")
-    if etype == "PushEvent":
-        line, when = fmt_push(e, token)
-        return line, when
-    if etype == "PullRequestEvent":
-        pr = e.get("payload", {}).get("pull_request", {})
-        merged = pr.get("merged", False)
-        verb = "merged" if merged else "opened"
-        return f"- PR #{pr.get('number')} {verb} in [{repo}]({repo_url}) — {when:%Y-%m-%d}", when
-    if etype == "IssuesEvent":
-        issue = e.get("payload", {}).get("issue", {})
-        return f"- Issue #{issue.get('number')} opened in [{repo}]({repo_url}) — {when:%Y-%m-%d}", when
-    return None, when
+class Gateway:
+    """Minimal api.github.com client: bounded attempts, exp backoff.
+
+    Inject `fetch(url, token)` and `sleep(seconds)` for tests.
+    """
+
+    def __init__(self, token: str | None = None, fetch: Any = None, sleep: Any = None):
+        self._token = token
+        self._fetch = fetch or _request
+        self._sleep = sleep or time.sleep
+
+    def get(self, url: str) -> Any:
+        last: _Transient | None = None
+        for attempt in range(ATTEMPTS):
+            try:
+                return self._fetch(url, self._token)
+            except _Definitive as e:
+                raise ApiError(str(e)) from None
+            except _Transient as e:
+                last = e
+                if attempt + 1 < ATTEMPTS:
+                    delay = min(RETRY_MAX, max(RETRY_BASE * 2**attempt, e.after or 0.0))
+                    warn(f"transient failure: {e}; retrying in {delay:.1f}s")
+                    self._sleep(delay)
+        raise ApiError(f"{last} (after {ATTEMPTS} attempts)")
 
 
-def build_activity(events: list[dict[str, Any]], token: str | None) -> str:
-    seen: set[str] = set()
-    items: list[tuple[datetime, str]] = []
-    lookups = 0
-    for e in events:
-        if len(items) + lookups >= 15 and len(items) >= MAX_ACTIVITIES:
+def replace_section(content: str, marker: str, new: str) -> str:
+    """Swap content between a marker pair; preserve everything else byte-exact."""
+    pattern = re.compile(
+        rf"(<!-- {marker} starts -->\n).*?(\n<!-- {marker} ends -->)", re.DOTALL
+    )
+    matches = pattern.findall(content)
+    if len(matches) != 1:
+        raise CriticalError(f"section {marker!r}: marker pair must occur exactly once")
+    return pattern.sub(lambda m: m.group(1) + new + m.group(2), content)
+
+
+def ensure_sections(content: str) -> None:
+    for marker in SECTION_MARKERS:
+        for tag in ("starts", "ends"):
+            n = content.count(f"<!-- {marker} {tag} -->")
+            if n != 1:
+                raise CriticalError(
+                    f"README marker '<!-- {marker} {tag} -->' occurs {n} times (expected 1)"
+                )
+
+
+def fetch_pages(gw: Gateway, base: str) -> list[dict]:
+    """Collect up to PAGES_CAP 100-entry pages; malformed entries are dropped."""
+    items: list[dict] = []
+    for page in range(1, PAGES_CAP + 1):
+        batch = gw.get(f"{base}&page={page}")
+        if not isinstance(batch, list):
+            if page == 1:
+                raise ApiError(f"{base}: expected a JSON list, got {type(batch).__name__}")
             break
-        if not relevant_event(e):
+        items.extend(item for item in batch if isinstance(item, dict))
+        if len(batch) < 100:
+            break
+    return items
+
+
+# ---------------------------------------------------------------------------
+# Activity feed
+# ---------------------------------------------------------------------------
+
+def relevant_event(ev: Any) -> bool:
+    if not isinstance(ev, dict):
+        return False
+    slug = (ev.get("repo") or {}).get("name")
+    if not isinstance(slug, str) or not SLUG_RE.fullmatch(slug) or slug == PROFILE_REPO:
+        return False
+    if is_bot((ev.get("actor") or {}).get("login")):
+        return False
+    payload = ev.get("payload") or {}
+    etype = ev.get("type")
+    if etype == "PushEvent":
+        return isinstance(payload.get("head"), str)
+    if etype == "PullRequestEvent":
+        pr = payload.get("pull_request") or {}
+        return payload.get("action") == "opened" or (
+            payload.get("action") == "closed" and pr.get("merged") is True
+        )
+    if etype == "IssuesEvent":
+        return payload.get("action") == "opened"
+    return False
+
+
+def event_key(ev: dict) -> str | None:
+    """Dedupe identity; None means 'not renderable' (caller warns + skips)."""
+    payload = ev.get("payload") or {}
+    etype = ev.get("type")
+    if etype == "PushEvent":
+        head = payload.get("head")
+        return f"push:{head}" if isinstance(head, str) and SHA_RE.fullmatch(head) else None
+    obj = payload.get("pull_request") or payload.get("issue") or {}
+    ident = obj.get("id")
+    return f"{etype}:{ident}" if isinstance(ident, int) else None
+
+
+def fmt_commit_line(slug: str, head: str, when: datetime, detail: dict) -> str | None:
+    if is_bot(((detail or {}).get("author") or {}).get("login")):
+        return None
+    subject = ((detail or {}).get("commit") or {}).get("message") or ""
+    subject = subject.split("\n", 1)[0].strip()
+    url = f"https://github.com/{slug}"
+    short = head[:7]
+    msg = esc(subject)
+    if msg:
+        return f"- [{slug}]({url}) — {msg} ([{short}]({url}/commit/{head})) — {when:%Y-%m-%d}"
+    return f"- Push to [{slug}]({url}) ([{short}]({url}/commit/{head})) — {when:%Y-%m-%d}"
+
+
+def format_event(ev: dict, gw: Gateway) -> str | None:
+    """Render one event; returns None (with warning) when unrenderable."""
+    slug = (ev.get("repo") or {}).get("name")
+    when = parse_ts(ev.get("created_at"))
+    if when is None:
+        warn(f"event {ev.get('id')}: missing/malformed created_at; skipped")
+        return None
+    payload = ev.get("payload") or {}
+    etype = ev.get("type")
+    url = f"https://github.com/{slug}"
+    if etype == "PushEvent":
+        head = payload.get("head")
+        if not isinstance(head, str) or not SHA_RE.fullmatch(head):
+            warn(f"event {ev.get('id')}: head is not a commit SHA; skipped")
+            return None
+        try:
+            detail = gw.get(f"{API}/repos/{slug}/commits/{head}")
+        except ApiError as e:
+            warn(f"{slug}: head commit {head[:7]} unavailable ({e}); event skipped")
+            return None
+        if not isinstance(detail, dict):
+            warn(f"{slug}: head commit {head[:7]} malformed; event skipped")
+            return None
+        return fmt_commit_line(slug, head, when, detail)
+    if etype == "PullRequestEvent":
+        pr = payload.get("pull_request") or {}
+        number = pr.get("number")
+        if not isinstance(number, int):
+            warn(f"event {ev.get('id')}: PR number missing; skipped")
+            return None
+        verb = "merged" if pr.get("merged") is True else "opened"
+        return f"- PR #{number} {verb} in [{slug}]({url}) — {when:%Y-%m-%d}"
+    issue = payload.get("issue") or {}
+    number = issue.get("number")
+    if not isinstance(number, int):
+        warn(f"event {ev.get('id')}: issue number missing; skipped")
+        return None
+    return f"- Issue #{number} opened in [{slug}]({url}) — {when:%Y-%m-%d}"
+
+
+def build_activity(gw: Gateway) -> str | None:
+    """Build the activity section; None keeps the previous section content."""
+    events = fetch_pages(gw, f"{API}/users/{USER}/events/public?per_page=100")
+    lines: list[tuple[datetime, str, str]] = []
+    seen: set[str] = set()
+    lookups = 0
+    skipped = 0
+    for ev in events:
+        if len(lines) + lookups >= MAX_LOOKUPS and len(lines) >= MAX_ACTIVITIES:
+            break
+        if not isinstance(ev, dict) or not relevant_event(ev):
             continue
-        # Dedup: head SHA for pushes, PR/issue id otherwise.
-        if e.get("type") == "PushEvent":
-            key = "push:" + e.get("payload", {}).get("head", e.get("id", ""))
-        else:
-            obj = e.get("payload", {}).get("pull_request") or e.get("payload", {}).get("issue") or {}
-            key = f"{e.get('type')}:{obj.get('id', e.get('id'))}"
+        key = event_key(ev)
+        if key is None:
+            skipped += 1
+            continue
         if key in seen:
             continue
         seen.add(key)
-        if e.get("type") == "PushEvent":
+        if ev.get("type") == "PushEvent":
             lookups += 1
-        line, when = fmt_event(e, token)
-        if line and when:
-            items.append((when, line))
-    items.sort(key=lambda i: i[0], reverse=True)
-    return "\n".join(line for _, line in items[:MAX_ACTIVITIES])
+        try:
+            line = format_event(ev, gw)
+        except ApiError:
+            line = None  # format_event already warned
+        if line:
+            when = parse_ts(ev.get("created_at"))
+            lines.append((when, key, line))
+    if skipped:
+        warn(f"activity: {skipped} event(s) lacked renderable identifiers; skipped")
+    if not lines:
+        warn("activity: no renderable public events; section kept from previous run")
+        return None
+    lines.sort(key=lambda i: (i[0], i[1]), reverse=True)
+    return "\n".join(line for _, _, line in lines[:MAX_ACTIVITIES])
 
 
-def build_repos(token: str | None) -> str:
-    """Fetch curated repos by name; fail loudly so stale content is kept."""
-    lines = []
-    repos = api_get(f"{GITHUB_API}/users/{USER}/repos?per_page=100", token)
-    by_name = {r.get("name"): r for r in repos}
-    for name in FEATURED:
-        r = by_name.get(name)
+# ---------------------------------------------------------------------------
+# Featured repositories
+# ---------------------------------------------------------------------------
+
+class RepoRef:
+    __slots__ = ("name", "repo_id")
+
+    def __init__(self, name: str | None, repo_id: int | None):
+        self.name = name
+        self.repo_id = repo_id
+
+    def __repr__(self) -> str:
+        return f"RepoRef(name={self.name!r}, repo_id={self.repo_id!r})"
+
+
+def repo_ref(entry: Any, index: int) -> RepoRef:
+    if not isinstance(entry, dict):
+        raise CriticalError(f"featured.json entry #{index} is not an object: {entry!r}")
+    rid = entry.get("id")
+    name = entry.get("name")
+    has_id = isinstance(rid, int) and not isinstance(rid, bool)
+    has_name = isinstance(name, str) and bool(NAME_RE.fullmatch(name.strip()))
+    if not (has_id or has_name):
+        raise CriticalError(
+            f"featured.json entry #{index} needs 'id' (int) or valid 'name': {entry!r}"
+        )
+    return RepoRef(name.strip() if has_name else None, rid if has_id else None)
+
+
+def load_featured(path: Path) -> list[RepoRef]:
+    try:
+        with open(path, encoding="utf-8") as f:
+            raw = json.load(f)
+    except OSError as e:
+        raise CriticalError(f"featured.json unreadable: {e}") from None
+    except json.JSONDecodeError as e:
+        raise CriticalError(f"featured.json is not valid JSON: {e}") from None
+    if not isinstance(raw, list):
+        raise CriticalError("featured.json must be a JSON array of objects")
+    refs = [repo_ref(entry, i) for i, entry in enumerate(raw)]
+    if not refs:
+        raise CriticalError("featured.json lists no repositories")
+    return refs
+
+
+def repo_line(r: dict) -> str | None:
+    name = r.get("name")
+    if not isinstance(name, str) or not NAME_RE.fullmatch(name):
+        warn(f"featured repo malformed (no usable name): {name!r}; skipped")
+        return None
+    url = r.get("html_url")
+    if not isinstance(url, str) or not url.startswith("https://github.com/"):
+        url = f"https://github.com/{USER}/{name}"
+    desc = esc(r.get("description")) or "_No description_"
+    stars = r.get("stargazers_count")
+    star = (
+        f" ({stars} ★)"
+        if isinstance(stars, int) and not isinstance(stars, bool) and stars > 0
+        else ""
+    )
+    pushed = parse_ts(r.get("pushed_at"))
+    date = f" — {pushed:%Y-%m-%d}" if pushed else ""
+    return f"- [{name}]({url}) — {desc}{star}{date}"
+
+
+def resolve_repo(ref: RepoRef, gw: Gateway, pool: list[dict]) -> dict | None:
+    """Resolve by immutable id first; fall back to name (redirect-following).
+
+    /repos/{owner}/{name} keeps redirecting after a rename, so a name-only
+    config survives renames too; a deleted/private repo yields None.
+    """
+    if ref.repo_id is not None:
+        for r in pool:
+            if r.get("id") == ref.repo_id:
+                return r
+        try:
+            by_id = gw.get(f"{API}/repositories/{ref.repo_id}")
+        except ApiError as e:
+            warn(f"featured {ref!r}: id lookup failed ({e})")
+            return None
+        return by_id if isinstance(by_id, dict) else None
+    for r in pool:
+        if r.get("name") == ref.name:
+            return r
+    try:
+        by_name = gw.get(f"{API}/repos/{USER}/{ref.name}")
+    except ApiError as e:
+        warn(f"featured {ref!r}: unavailable ({e})")
+        return None
+    return by_name if isinstance(by_name, dict) else None
+
+
+def build_featured(gw: Gateway, config_path: Path) -> str | None:
+    """Build the featured section, or None to keep previous content."""
+    refs = load_featured(config_path)
+    pool = fetch_pages(gw, f"{API}/users/{USER}/repos?per_page=100")
+    lines: list[str] = []
+    missing = 0
+    for ref in refs:
+        r = resolve_repo(ref, gw, pool)
         if r is None:
-            raise RuntimeError(f"Featured repo {name!r} not found via API")
-        url = r.get("html_url") or f"https://github.com/{USER}/{name}"
-        desc = esc(r.get("description") or "_No description_")
-        stars = r.get("stargazers_count", 0)
-        star = f" ({stars} ★)" if stars else ""
-        pushed = ts(r.get("pushed_at"))
-        date = f" — {pushed:%Y-%m-%d}" if pushed else ""
-        lines.append(f"- [{name}]({url}) — {desc}{star}{date}")
+            missing += 1
+            warn(f"featured repository {ref!r} not found (deleted, private, or renamed without id)")
+            continue
+        line = repo_line(r)
+        if line:
+            lines.append(line)
+    if not lines:
+        warn("featured repositories: nothing resolvable; section kept from previous run")
+        return None
+    if missing:
+        warn(f"featured repositories: {missing} of {len(refs)} unresolved")
     return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
+# Orchestration
+# ---------------------------------------------------------------------------
+
+def run_update(
+    token: str | None = None,
+    readme_path: Path | None = None,
+    config_path: Path | None = None,
+    gw: Gateway | None = None,
+) -> bool:
+    """Build, validate, and atomically swap the README. True iff changed."""
+    readme = Path(readme_path) if readme_path else README_PATH
+    config = Path(config_path) if config_path else FEATURED_CONFIG
+    original = readme.read_text(encoding="utf-8")
+    ensure_sections(original)
+    gateway = gw or Gateway(token=token)
+
+    updated = original
+    for marker in SECTION_MARKERS:
+        builder = build_activity if marker == "ACTIVITY" else (lambda g: build_featured(g, config))
+        try:
+            new = builder(gateway)
+        except CriticalError:
+            raise  # structural/config defects abort before any write
+        except ApiError as e:
+            warn(f"{marker}: data unavailable, keeping previous content ({e})")
+            continue
+        except Exception as e:  # noqa: BLE001 surfaced; never corrupt the README
+            warn(f"{marker}: unexpected failure ({type(e).__name__}: {e}); section kept")
+            continue
+        if new is None:
+            continue  # builder warned and chose to keep previous content
+        updated = replace_section(updated, marker, new)
+
+    if updated == original:
+        return False
+    ensure_sections(updated)
+    tmp = readme.with_name(readme.name + ".tmp")
+    tmp.write_text(updated, encoding="utf-8")
+    os.replace(tmp, readme)
+    return True
 
 
 def main() -> int:
     token = os.environ.get("GITHUB_TOKEN")
     try:
-        original = read_readme()
-        events = api_get(f"{GITHUB_API}/users/{USER}/events/public?per_page=100", token)
-        activity = build_activity(events, token)
-        featured = build_repos(token)
-        updated = replace_section(original, "ACTIVITY", activity)
-        updated = replace_section(updated, "REPOSITORIES", featured)
-        if updated != original:
-            with open(README_PATH, "w", encoding="utf-8") as f:
-                f.write(updated)
-            print("README updated")
-        else:
-            print("No changes needed")
+        changed = run_update(token)
+        print("README updated" if changed else "No changes needed")
         return 0
-    except Exception as e:
-        print(f"Error: {e}", file=sys.stderr)
+    except CriticalError as e:
+        print(f"ERROR: {e}", file=sys.stderr, flush=True)
+        return 1
+    except Exception as e:  # boundary: fail loudly, never half-write
+        print(f"ERROR: unexpected {type(e).__name__}: {e}", file=sys.stderr, flush=True)
+        traceback.print_exc(file=sys.stderr)
         return 1
 
 
