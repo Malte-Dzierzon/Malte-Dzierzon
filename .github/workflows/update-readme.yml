@@ -3,44 +3,55 @@ name: Update Profile README
 on:
   workflow_dispatch:
   schedule:
+    # GitHub may delay scheduled runs; the script is idempotent, so late or
+    # double execution is safe. Every 4 hours keeps the panel fresh enough.
     - cron: "17 */4 * * *"
   push:
     branches: [main]
     paths:
       - "scripts/update_readme.py"
       - ".github/workflows/update-readme.yml"
+      - "featured.json"
+      # README commits (by the bot below or by hand) do NOT trigger this
+      # workflow: the bot-only commit touches README.md, so no trigger loop.
 
 permissions:
   contents: write
 
 concurrency:
   group: readme-update
-  cancel-in-progress: false
+  # A newer run supersedes an older one; content is regenerated from the API
+  # either way, so canceling is safe and avoids pull/push races.
+  cancel-in-progress: true
 
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4 # dependency: release tag (official action)
+        with:
+          fetch-depth: 0 # git pull --rebase needs history
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v5 # dependency: release tag (official action)
         with:
-          python-version: "3.12"
+          python-version: "3.12" # stdlib-only script: no pip cache needed
 
-      - name: Update README
+      - name: Update README (exit 0, without commit, when unchanged)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          python scripts/update_readme.py
-          git diff --stat README.md || true
+        run: python scripts/update_readme.py
 
-      - name: Commit and push if changed
+      - name: Commit and push only real changes
         run: |
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
-          git diff --quiet -- README.md && echo "No changes, skipping commit." && exit 0
+          if git diff --quiet -- README.md; then
+            echo "No changes, skipping commit."
+            exit 0
+          fi
           git add README.md
           git commit -m "Update recent activity"
           git pull --rebase origin main
