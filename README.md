@@ -21,7 +21,7 @@ xealomlinux~ git log -4
 xealomlinux~ eza ~/projects
 
 <!-- REPOSITORIES starts -->
-- [dot-files](https://github.com/Malte-Dzierzon/dot-files) — my personal used linux setup — 2026-10-18
+- [dot-files](https://github.com/Malte-Dzierzon/dot-files) — my personal used linux setup — 2026-10-22
 - [Informatik-Projekt-August-Malte](https://github.com/Malte-Dzierzon/Informatik-Projekt-August-Malte) — Training a neural network to recognize pyramids based on the vertices (2 ★) — 2026-09-01
 - [omarchy-haven-theme](https://github.com/Malte-Dzierzon/omarchy-haven-theme) — Dark all-round Omarchy theme with a muted, readable palette that fits many wallpapers — 2026-09-06
 <!-- REPOSITORIES ends -->
