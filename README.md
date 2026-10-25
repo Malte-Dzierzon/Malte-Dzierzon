@@ -7,10 +7,10 @@
 xealomlinux~ git log -4
 
 <!-- ACTIVITY starts -->
+- [Malte-Dzierzon/wenyi](https://github.com/Malte-Dzierzon/wenyi) — docs: add architecture audit and Rust migration plan ([ae2d051](https://github.com/Malte-Dzierzon/wenyi/commit/ae2d0514adb14803ab99cadd27176707c996f204)) — 2026-10-25
+- [Malte-Dzierzon/wenyi](https://github.com/Malte-Dzierzon/wenyi) — docs: retarget README to Rust-native desktop direction ([eb2548c](https://github.com/Malte-Dzierzon/wenyi/commit/eb2548cdcc674ee182baffabdaab97021fa07bbe)) — 2026-10-25
 - [Malte-Dzierzon/dot-files](https://github.com/Malte-Dzierzon/dot-files) — Sync daily-drive drift into repo (default-app, umbriel, fish, zed, ghostty, qt6ct, yazi) ([5ce02fc](https://github.com/Malte-Dzierzon/dot-files/commit/5ce02fc7b8f386538e91153f6706d8765a0d55ca)) — 2026-10-22
 - [Malte-Dzierzon/dot-files](https://github.com/Malte-Dzierzon/dot-files) — Move app configs into Config/ folder ([d3f9505](https://github.com/Malte-Dzierzon/dot-files/commit/d3f95052f89a46c798e0ad4f04f67cdbbdce1c21)) — 2026-10-18
-- [Malte-Dzierzon/dot-files](https://github.com/Malte-Dzierzon/dot-files) — Use higher-res desktop thumbnails (1280x720) for previews ([00ca0ee](https://github.com/Malte-Dzierzon/dot-files/commit/00ca0ee007cec3be70a6f52ec3b9a57357cd1c08)) — 2026-10-18
-- [Malte-Dzierzon/dot-files](https://github.com/Malte-Dzierzon/dot-files) — Add web thumbnails for screenshots, make wallpaper section collapsible ([3e0fea2](https://github.com/Malte-Dzierzon/dot-files/commit/3e0fea2b0ba1c76e707b7b99969bbe16a3760d5f)) — 2026-10-18
 <!-- ACTIVITY ends -->
 
 </td>
