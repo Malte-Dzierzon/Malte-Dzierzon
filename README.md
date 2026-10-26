@@ -7,10 +7,10 @@
 xealomlinux~ git log -4
 
 <!-- ACTIVITY starts -->
+- [Malte-Dzierzon/dot-files](https://github.com/Malte-Dzierzon/dot-files) — Revise IDE and agent harness descriptions in README ([c055957](https://github.com/Malte-Dzierzon/dot-files/commit/c055957baec567f06b808b51c748f300b9445343)) — 2026-10-25
 - [Malte-Dzierzon/wenyi](https://github.com/Malte-Dzierzon/wenyi) — native: gate background polls on visibility, skip no-op re-renders ([bb0a85e](https://github.com/Malte-Dzierzon/wenyi/commit/bb0a85e568235bc48aa293561bbf1069eb8cec5f)) — 2026-10-25
 - [Malte-Dzierzon/dot-files](https://github.com/Malte-Dzierzon/dot-files) — Fix image tag in README.md ([7b23f4a](https://github.com/Malte-Dzierzon/dot-files/commit/7b23f4a5a9c5e2cbfa633a014f7c72bac486c44c)) — 2026-10-25
 - [Malte-Dzierzon/wenyi](https://github.com/Malte-Dzierzon/wenyi) — docs: add architecture audit and Rust migration plan ([ae2d051](https://github.com/Malte-Dzierzon/wenyi/commit/ae2d0514adb14803ab99cadd27176707c996f204)) — 2026-10-25
-- [Malte-Dzierzon/wenyi](https://github.com/Malte-Dzierzon/wenyi) — docs: retarget README to Rust-native desktop direction ([eb2548c](https://github.com/Malte-Dzierzon/wenyi/commit/eb2548cdcc674ee182baffabdaab97021fa07bbe)) — 2026-10-25
 <!-- ACTIVITY ends -->
 
 </td>
