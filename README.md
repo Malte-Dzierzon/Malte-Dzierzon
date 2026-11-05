@@ -7,10 +7,10 @@
 xealomlinux~ git log -4
 
 <!-- ACTIVITY starts -->
+- [Malte-Dzierzon/minecraft-debugging-skill](https://github.com/Malte-Dzierzon/minecraft-debugging-skill) — Refactor: three workflows (startup/crash, rendering, simulation) + shared refs ([b096ba2](https://github.com/Malte-Dzierzon/minecraft-debugging-skill/commit/b096ba2a0979a0efba3059d37427d77fa7e96e41)) — 2026-11-04
 - [Malte-Dzierzon/minecraft-debugging-skill](https://github.com/Malte-Dzierzon/minecraft-debugging-skill) — README: compact intro, expandable workflow diagrams ([976f9ba](https://github.com/Malte-Dzierzon/minecraft-debugging-skill/commit/976f9ba5d6df60f7b7eb738453a35a6ac7a83130)) — 2026-10-30
 - [Malte-Dzierzon/minecraft-debugging-skill](https://github.com/Malte-Dzierzon/minecraft-debugging-skill) — Profiling-first workflow: tiered depths/pipelines, recon gate, tool roles, report contract ([dcceb6f](https://github.com/Malte-Dzierzon/minecraft-debugging-skill/commit/dcceb6f394e353e88ee0cafba230695ac0b033d4)) — 2026-10-30
 - [Malte-Dzierzon/minecraft-debugging-skill](https://github.com/Malte-Dzierzon/minecraft-debugging-skill) — README workflow graphic matches phased skill: path gate, verify step, bottom line ([6418fae](https://github.com/Malte-Dzierzon/minecraft-debugging-skill/commit/6418fae5f67548f4878bbfcce64f3ce6408279f8)) — 2026-10-29
-- [Malte-Dzierzon/minecraft-debugging-skill](https://github.com/Malte-Dzierzon/minecraft-debugging-skill) — Evidence-first workflow with phased investigation and regression guards ([528706c](https://github.com/Malte-Dzierzon/minecraft-debugging-skill/commit/528706cc75688c98f4f70e1e6961a6fc1afe747f)) — 2026-10-29
 <!-- ACTIVITY ends -->
 
 </td>
