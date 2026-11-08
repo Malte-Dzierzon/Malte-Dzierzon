@@ -7,10 +7,10 @@
 xealomlinux~ git log -4
 
 <!-- ACTIVITY starts -->
+- [Malte-Dzierzon/Paleon](https://github.com/Malte-Dzierzon/Paleon) — Installation: add Git LFS install commands ([d9d22d9](https://github.com/Malte-Dzierzon/Paleon/commit/d9d22d94f346100bdcbf5e4a9ec51c073e97b03f)) — 2026-11-07
 - [Malte-Dzierzon/Paleon](https://github.com/Malte-Dzierzon/Paleon) — Installation: use plain git clone with LFS note ([dee8499](https://github.com/Malte-Dzierzon/Paleon/commit/dee84996ec8e9650559fcc5e494dfe1da073d89b)) — 2026-11-07
+- [Malte-Dzierzon/Paleon](https://github.com/Malte-Dzierzon/Paleon) — About open, rest collapsible; drop Features section ([c9664b8](https://github.com/Malte-Dzierzon/Paleon/commit/c9664b8943c2f65fb7c8772c4811617f547bc8e7)) — 2026-11-07
 - [Malte-Dzierzon/Paleon](https://github.com/Malte-Dzierzon/Paleon) — Paleon README: banner, about, features, collapsible mod list, placeholder benchmarks ([1e5cffa](https://github.com/Malte-Dzierzon/Paleon/commit/1e5cffadec220d8ac4f378095def7301640dda0b)) — 2026-11-07
-- [Malte-Dzierzon/minecraft-debugging-skill](https://github.com/Malte-Dzierzon/minecraft-debugging-skill) — README: slimmer header, workflow table, plain sketches ([8d5f229](https://github.com/Malte-Dzierzon/minecraft-debugging-skill/commit/8d5f229bde4e54cd0ae7f44b355415e6f4095356)) — 2026-11-07
-- [Malte-Dzierzon/minecraft-debugging-skill](https://github.com/Malte-Dzierzon/minecraft-debugging-skill) — Refactor: three workflows (startup/crash, rendering, simulation) + shared refs ([b096ba2](https://github.com/Malte-Dzierzon/minecraft-debugging-skill/commit/b096ba2a0979a0efba3059d37427d77fa7e96e41)) — 2026-11-04
 <!-- ACTIVITY ends -->
 
 </td>
