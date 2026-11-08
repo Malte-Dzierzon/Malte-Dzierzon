@@ -7,10 +7,10 @@
 xealomlinux~ git log -4
 
 <!-- ACTIVITY starts -->
+- [Malte-Dzierzon/Paleon](https://github.com/Malte-Dzierzon/Paleon) — Installation: use plain git clone with LFS note ([dee8499](https://github.com/Malte-Dzierzon/Paleon/commit/dee84996ec8e9650559fcc5e494dfe1da073d89b)) — 2026-11-07
+- [Malte-Dzierzon/Paleon](https://github.com/Malte-Dzierzon/Paleon) — Paleon README: banner, about, features, collapsible mod list, placeholder benchmarks ([1e5cffa](https://github.com/Malte-Dzierzon/Paleon/commit/1e5cffadec220d8ac4f378095def7301640dda0b)) — 2026-11-07
+- [Malte-Dzierzon/minecraft-debugging-skill](https://github.com/Malte-Dzierzon/minecraft-debugging-skill) — README: slimmer header, workflow table, plain sketches ([8d5f229](https://github.com/Malte-Dzierzon/minecraft-debugging-skill/commit/8d5f229bde4e54cd0ae7f44b355415e6f4095356)) — 2026-11-07
 - [Malte-Dzierzon/minecraft-debugging-skill](https://github.com/Malte-Dzierzon/minecraft-debugging-skill) — Refactor: three workflows (startup/crash, rendering, simulation) + shared refs ([b096ba2](https://github.com/Malte-Dzierzon/minecraft-debugging-skill/commit/b096ba2a0979a0efba3059d37427d77fa7e96e41)) — 2026-11-04
-- [Malte-Dzierzon/minecraft-debugging-skill](https://github.com/Malte-Dzierzon/minecraft-debugging-skill) — README: compact intro, expandable workflow diagrams ([976f9ba](https://github.com/Malte-Dzierzon/minecraft-debugging-skill/commit/976f9ba5d6df60f7b7eb738453a35a6ac7a83130)) — 2026-10-30
-- [Malte-Dzierzon/minecraft-debugging-skill](https://github.com/Malte-Dzierzon/minecraft-debugging-skill) — Profiling-first workflow: tiered depths/pipelines, recon gate, tool roles, report contract ([dcceb6f](https://github.com/Malte-Dzierzon/minecraft-debugging-skill/commit/dcceb6f394e353e88ee0cafba230695ac0b033d4)) — 2026-10-30
-- [Malte-Dzierzon/minecraft-debugging-skill](https://github.com/Malte-Dzierzon/minecraft-debugging-skill) — README workflow graphic matches phased skill: path gate, verify step, bottom line ([6418fae](https://github.com/Malte-Dzierzon/minecraft-debugging-skill/commit/6418fae5f67548f4878bbfcce64f3ce6408279f8)) — 2026-10-29
 <!-- ACTIVITY ends -->
 
 </td>
