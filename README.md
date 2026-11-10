@@ -7,10 +7,10 @@
 xealomlinux~ git log -4
 
 <!-- ACTIVITY starts -->
+- [Malte-Dzierzon/wenyi](https://github.com/Malte-Dzierzon/wenyi) — feat(beam): reasoning cap, per-model limits UI, batch validation ([cd1bc11](https://github.com/Malte-Dzierzon/wenyi/commit/cd1bc112bada0984abc260b4f87a11c7a481468f)) — 2026-11-09
+- [Malte-Dzierzon/wenyi](https://github.com/Malte-Dzierzon/wenyi) — fix(db): migrate mentions column on existing SQLite databases ([21114de](https://github.com/Malte-Dzierzon/wenyi/commit/21114de18a582c1de55dda59ad5cc090113e23f3)) — 2026-11-09
 - [Malte-Dzierzon/wenyi](https://github.com/Malte-Dzierzon/wenyi) — docs: rewrite README in readme-template style ([564de26](https://github.com/Malte-Dzierzon/wenyi/commit/564de2658162ebd358c0e83f7d5d7a3f0269cfd2)) — 2026-11-09
 - [Malte-Dzierzon/readme-template](https://github.com/Malte-Dzierzon/readme-template) — Everything in English, no dot-files references, shorter README ([b9350b6](https://github.com/Malte-Dzierzon/readme-template/commit/b9350b6bab65538af942096dd47dc634b61cd2fb)) — 2026-11-09
-- [Malte-Dzierzon/dot-files](https://github.com/Malte-Dzierzon/dot-files) — docs: redesign README (centered header, quick start, gallery section) ([07cb4c3](https://github.com/Malte-Dzierzon/dot-files/commit/07cb4c342370b16cfd1bbafa94cc146a6e831efc)) — 2026-11-08
-- [Malte-Dzierzon/wenyi](https://github.com/Malte-Dzierzon/wenyi) — native: tps card, settings grid, worker tab, scroll boxes, hover polish, roadmap docs ([86e6c1b](https://github.com/Malte-Dzierzon/wenyi/commit/86e6c1b8f4260856b631fe382688324116d170c1)) — 2026-11-08
 <!-- ACTIVITY ends -->
 
 </td>
