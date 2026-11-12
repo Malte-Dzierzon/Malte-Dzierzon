@@ -7,10 +7,10 @@
 xealomlinux~ git log -4
 
 <!-- ACTIVITY starts -->
-- [Malte-Dzierzon/wenyi](https://github.com/Malte-Dzierzon/wenyi) — docs(readme): text title, native screenshots, accurate stack table ([39068fc](https://github.com/Malte-Dzierzon/wenyi/commit/39068fcc4e491d52085573418275f8406a86af21)) — 2026-11-09
-- [Malte-Dzierzon/wenyi](https://github.com/Malte-Dzierzon/wenyi) — feat(knowledge): multiline fields, analysis refresh, DE literary voice ([d6fc4dd](https://github.com/Malte-Dzierzon/wenyi/commit/d6fc4dd2b3dcf41a8b818c54a2d94c9d27f87ed2)) — 2026-11-09
-- [Malte-Dzierzon/wenyi](https://github.com/Malte-Dzierzon/wenyi) — fix(shutdown): no freeze on close, orphan reaper, pause-before-close ([85f8251](https://github.com/Malte-Dzierzon/wenyi/commit/85f825182529cc56576f44a53631632233b5a145)) — 2026-11-09
-- [Malte-Dzierzon/wenyi](https://github.com/Malte-Dzierzon/wenyi) — fix(perf): extractor occurrence cache, WAL term reads, native timeouts ([507c470](https://github.com/Malte-Dzierzon/wenyi/commit/507c4708a158c6f9508faefcbab2d03a10db99c8)) — 2026-11-09
+- [Malte-Dzierzon/wenyi](https://github.com/Malte-Dzierzon/wenyi) — chore(repo): sync main with local tree, drop retired stacks ([35d03b2](https://github.com/Malte-Dzierzon/wenyi/commit/35d03b22065250d15ae73afff12f31fbdbed26cf)) — 2026-11-10
+- [Malte-Dzierzon/wenyi](https://github.com/Malte-Dzierzon/wenyi) — feat(engine): slice 4 one-book translation parity in wenyi-core ([d8ed3ee](https://github.com/Malte-Dzierzon/wenyi/commit/d8ed3eeb5a8c14bbb2dcba2d448a52e1392ab8c8)) — 2026-11-10
+- [Malte-Dzierzon/readme-template](https://github.com/Malte-Dzierzon/readme-template) — Update badge in README to reflect style change ([407c0a2](https://github.com/Malte-Dzierzon/readme-template/commit/407c0a2e8a40c0a74868ad9482dc3b34d96afcef)) — 2026-11-10
+- [Malte-Dzierzon/doc-skill](https://github.com/Malte-Dzierzon/doc-skill) — Update README.md ([7f0d182](https://github.com/Malte-Dzierzon/doc-skill/commit/7f0d1828943e007f46de9f107ecf38c876565f01)) — 2026-11-10
 <!-- ACTIVITY ends -->
 
 </td>
