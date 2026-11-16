@@ -9,8 +9,8 @@ xealomlinux~ git log -4
 <!-- ACTIVITY starts -->
 - [Malte-Dzierzon/dot-files](https://github.com/Malte-Dzierzon/dot-files) — Update README.md ([662e0be](https://github.com/Malte-Dzierzon/dot-files/commit/662e0be40b348a9ad1cccc059115c656a01387d1)) — 2026-11-14
 - [Malte-Dzierzon/dot-files](https://github.com/Malte-Dzierzon/dot-files) — Q&A: personal tone, drop display-manager entry ([e86cfdf](https://github.com/Malte-Dzierzon/dot-files/commit/e86cfdf4e57977515cfc71b9f61cd0af4b68cb8d)) — 2026-11-14
-- [Malte-Dzierzon/dot-files](https://github.com/Malte-Dzierzon/dot-files) — umbriel: Mod+Shift+D opens Resources, Mod+M opens KittyTune ([9a220e0](https://github.com/Malte-Dzierzon/dot-files/commit/9a220e0003f3fd9eeafa4ab62e63d6e77e6d1d12)) — 2026-11-13
-- [Malte-Dzierzon/dot-files](https://github.com/Malte-Dzierzon/dot-files) — Drop redundant Apps section, remove kew and cava from App-Liste ([1d54822](https://github.com/Malte-Dzierzon/dot-files/commit/1d54822968a0d99b68b154b556f191383419abc7)) — 2026-11-12
+- [Malte-Dzierzon/dot-files](https://github.com/Malte-Dzierzon/dot-files) — kittytune: launch in app-kittytune scope so Resources shows it as an app ([627793d](https://github.com/Malte-Dzierzon/dot-files/commit/627793dde87eeb60e4ad80c7ab7d5a0a0563f0cd)) — 2026-11-13
+- [Malte-Dzierzon/dot-files](https://github.com/Malte-Dzierzon/dot-files) — README: App-Liste auf genutzte + integrierte Apps bereinigt ([e109755](https://github.com/Malte-Dzierzon/dot-files/commit/e10975549754d26dd48c6a480a211fa210a1a2d9)) — 2026-11-13
 <!-- ACTIVITY ends -->
 
 </td>
